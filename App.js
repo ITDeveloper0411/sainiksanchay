@@ -1,5 +1,18 @@
-import StartedScreen from './src/StartedScreen';
+import React from 'react';
+import MainNavigator from './src/navigation/MainNavigator';
+import { Provider } from 'react-redux';
+import store from './src/store/store';
 
-export default function LoanAppLogin() {
-  return <StartedScreen />;
+import { SafeAreaProvider } from 'react-native-safe-area-context'; // ✅ added
+
+function App() {
+  return (
+    <Provider store={store}>
+      <SafeAreaProvider>
+        <MainNavigator />
+      </SafeAreaProvider>
+    </Provider>
+  );
 }
+
+export default App;

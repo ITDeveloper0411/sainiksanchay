@@ -13,10 +13,11 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@react-native-vector-icons/ionicons';
-import { GlobalFonts } from '../config/GlobalFonts';
-import CustomTextInput from '../components/CustomTextInput';
-import CustomButton from '../components/CustomButton';
-import { LOGO } from '../config/Constant';
+import { GlobalFonts } from '../../config/GlobalFonts';
+import CustomTextInput from '../../components/CustomTextInput';
+import CustomButton from '../../components/CustomButton';
+import { LOGO } from '../../config/Constant';
+import { Colors } from '../../config/Colors';
 
 export default function LoginScreen() {
   const [username, setUsername] = useState('');
@@ -43,7 +44,10 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-      <StatusBar backgroundColor="#0d2b4b" barStyle="light-content" />
+      <StatusBar
+        backgroundColor={Colors.primaryBlue}
+        barStyle="light-content"
+      />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoid}
@@ -108,7 +112,11 @@ export default function LoginScreen() {
                     style={[styles.checkbox, rememberMe && styles.checkedBox]}
                   >
                     {rememberMe && (
-                      <Ionicons name="checkmark" size={16} color="white" />
+                      <Ionicons
+                        name="checkmark"
+                        size={16}
+                        color={Colors.white}
+                      />
                     )}
                   </View>
                   <Text style={styles.rememberText}>Remember me</Text>
@@ -125,11 +133,19 @@ export default function LoginScreen() {
               {/* Security Features */}
               <View style={styles.securityContainer}>
                 <View style={styles.securityItem}>
-                  <Ionicons name="shield-checkmark" size={16} color="#10b981" />
+                  <Ionicons
+                    name="shield-checkmark"
+                    size={16}
+                    color={Colors.success}
+                  />
                   <Text style={styles.securityText}>Bank-grade security</Text>
                 </View>
                 <View style={styles.securityItem}>
-                  <Ionicons name="lock-closed" size={16} color="#10b981" />
+                  <Ionicons
+                    name="lock-closed"
+                    size={16}
+                    color={Colors.success}
+                  />
                   <Text style={styles.securityText}>SSL encrypted</Text>
                 </View>
               </View>
@@ -152,7 +168,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f7fa',
+    backgroundColor: Colors.lightBackground,
   },
   keyboardAvoid: {
     flex: 1,
@@ -162,7 +178,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   header: {
-    backgroundColor: '#0d2b4b',
+    backgroundColor: Colors.primaryBlue,
     alignItems: 'center',
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 20 : 40,
     paddingBottom: 40,
@@ -170,7 +186,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
     marginBottom: 20,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.2,
     shadowRadius: 15,
@@ -180,11 +196,11 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: 'white',
+    backgroundColor: Colors.white,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 15,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -196,17 +212,17 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    color: 'white',
+    color: Colors.white,
     marginBottom: 8,
     letterSpacing: 0.5,
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowColor: Colors.transparentBlack30,
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
     fontFamily: GlobalFonts.textBold,
   },
   subtitle: {
     fontSize: 14,
-    color: '#a0c1d4',
+    color: Colors.lightBlue,
     textAlign: 'center',
     paddingHorizontal: 20,
     fontFamily: GlobalFonts.textSemiBold,
@@ -224,19 +240,19 @@ const styles = StyleSheet.create({
     left: 5,
     right: -5,
     bottom: -5,
-    backgroundColor: 'rgba(13, 43, 75, 0.15)',
+    backgroundColor: Colors.transparentBlue15,
     borderRadius: 20,
     zIndex: 1,
   },
   formContainer: {
-    backgroundColor: 'white',
+    backgroundColor: Colors.white,
     paddingHorizontal: 25,
     paddingVertical: 10,
     borderRadius: 20,
     zIndex: 2,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.8)',
-    shadowColor: '#0d2b4b',
+    borderColor: Colors.transparentWhite80,
+    shadowColor: Colors.primaryBlue,
     shadowOffset: {
       width: 0,
       height: 6,
@@ -247,13 +263,13 @@ const styles = StyleSheet.create({
   },
   loginText: {
     fontSize: 24,
-    color: '#0d2b4b',
+    color: Colors.primaryBlue,
     textAlign: 'center',
     fontFamily: GlobalFonts.textBold,
   },
   welcomeSubtext: {
     fontSize: 15,
-    color: '#6B7280',
+    color: Colors.textMediumGray,
     textAlign: 'center',
     marginBottom: 15,
     fontFamily: GlobalFonts.textLight,
@@ -272,23 +288,23 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
     borderWidth: 1.5,
-    borderColor: '#2c6c8c',
+    borderColor: Colors.darkBlue,
     borderRadius: 2,
     marginRight: 4,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: Colors.lightBackground,
   },
   checkedBox: {
-    backgroundColor: '#2c6c8c',
+    backgroundColor: Colors.darkBlue,
   },
   rememberText: {
-    color: '#4B5563',
+    color: Colors.textLightGray,
     fontSize: 12,
     fontFamily: GlobalFonts.textRegular,
   },
   forgotText: {
-    color: '#2c6c8c',
+    color: Colors.darkBlue,
     fontSize: 12,
     fontFamily: GlobalFonts.textBold,
   },
@@ -298,9 +314,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingVertical: 15,
     borderTopWidth: 1,
-    borderTopColor: '#f1f5f9',
+    borderTopColor: Colors.borderLight,
     borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
+    borderBottomColor: Colors.borderLight,
   },
   securityItem: {
     flexDirection: 'row',
@@ -308,7 +324,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   securityText: {
-    color: '#4B5563',
+    color: Colors.textLightGray,
     fontSize: 14,
     fontFamily: GlobalFonts.textLight,
   },
@@ -317,12 +333,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   signupText: {
-    color: '#666',
+    color: Colors.textGray,
     fontSize: 15,
     fontFamily: GlobalFonts.textLight,
   },
   signupLink: {
-    color: '#0d2b4b',
+    color: Colors.primaryBlue,
     fontSize: 15,
     fontFamily: GlobalFonts.textBold,
   },

@@ -9,16 +9,14 @@ import {
   FlatList,
   Animated,
   Easing,
-  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { LinearGradient } from 'react-native-linear-gradient';
-import { LOGO } from './config/Constant';
+import { LOGO, WIDTH } from '../config/Constant';
+import { Colors } from '../config/Colors';
 
-const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
-
-const StartedScreen = () => {
+const StartedScreen = ({ navigation }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef(null);
   const buttonScale = useRef(new Animated.Value(1)).current;
@@ -28,28 +26,28 @@ const StartedScreen = () => {
       {
         id: '1',
         icon: '💰',
-        bgColor: '#EBF5FF',
+        bgColor: Colors.featureBlue,
         title: 'Start Small',
         desc: 'From just ₹100/month',
       },
       {
         id: '2',
         icon: '📈',
-        bgColor: '#F0F9F0',
+        bgColor: Colors.featureGreen,
         title: 'High Returns',
         desc: 'Up to 8% interest',
       },
       {
         id: '3',
         icon: '🛡️',
-        bgColor: '#FFF5F5',
+        bgColor: Colors.featureRed,
         title: 'Insurance',
         desc: 'Free term coverage',
       },
       {
         id: '4',
         icon: '🔒',
-        bgColor: '#F5F3FF',
+        bgColor: Colors.featurePurple,
         title: 'Secure',
         desc: 'RBI compliant',
       },
@@ -58,28 +56,28 @@ const StartedScreen = () => {
       {
         id: '1',
         icon: '⚡',
-        bgColor: '#FFFBEB',
+        bgColor: Colors.featureYellow,
         title: 'Quick Access',
         desc: 'Borrow instantly',
       },
       {
         id: '2',
         icon: '📝',
-        bgColor: '#F0FDF4',
+        bgColor: Colors.featureLightGreen,
         title: 'No CIBIL',
         desc: '0% impact on score',
       },
       {
         id: '3',
         icon: '💳',
-        bgColor: '#FDF2F8',
+        bgColor: Colors.featurePink,
         title: 'High Value',
         desc: 'Up to 75% of savings',
       },
       {
         id: '4',
         icon: '🔄',
-        bgColor: '#ECFDF5',
+        bgColor: Colors.featureTeal,
         title: 'Flexible',
         desc: 'Multiple purposes',
       },
@@ -88,28 +86,28 @@ const StartedScreen = () => {
       {
         id: '1',
         icon: '🏪',
-        bgColor: '#FFEDD5',
+        bgColor: Colors.featureOrange,
         title: 'MSME Support',
         desc: 'Local businesses',
       },
       {
         id: '2',
         icon: '⏱️',
-        bgColor: '#E0E7FF',
+        bgColor: Colors.featureIndigo,
         title: 'Interest-Free',
         desc: '10-day credit',
       },
       {
         id: '3',
         icon: '🇮🇳',
-        bgColor: '#FCE7F3',
+        bgColor: Colors.featureLightPink,
         title: 'Indian MSME',
         desc: 'Support local',
       },
       {
         id: '4',
         icon: '🤝',
-        bgColor: '#D1FAE5',
+        bgColor: Colors.featureMint,
         title: 'Community',
         desc: 'Growth together',
       },
@@ -123,7 +121,7 @@ const StartedScreen = () => {
       title: 'Flexible Savings Plans',
       text: 'Choose from multiple savings options starting at just ₹100 per month. Our premium plans offer higher returns and additional benefits.',
       features: featuresData.savings,
-      color: '#0f2b46',
+      color: Colors.primary,
     },
     {
       id: '2',
@@ -131,7 +129,7 @@ const StartedScreen = () => {
       title: 'Instant Loan Facilities',
       text: 'Access loans against your savings without any CIBIL check. Get approvals within hours for urgent financial needs.',
       features: featuresData.loans,
-      color: '#1a365d',
+      color: Colors.primaryLight,
     },
     {
       id: '3',
@@ -204,11 +202,14 @@ const StartedScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0a1e33" />
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={Colors.primaryDark}
+      />
 
       {/* Premium Header Design */}
       <LinearGradient
-        colors={['#0a1e33', '#0f2b46', '#1a365d']}
+        colors={[Colors.primaryDark, Colors.primary, Colors.primaryLight]}
         style={styles.header}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -226,7 +227,7 @@ const StartedScreen = () => {
 
           <View style={styles.headerTextContainer}>
             <View style={styles.headerBadge}>
-              <Ionicons name="ribbon" size={14} color="#fff" />
+              <Ionicons name="ribbon" size={14} color={Colors.white} />
               <Text style={styles.headerBadgeText}>Service First</Text>
             </View>
             <Text style={styles.headerTitle}>Sainik Sanchay</Text>
@@ -234,7 +235,11 @@ const StartedScreen = () => {
 
             <View style={styles.headerDivider}>
               <View style={styles.dividerLine} />
-              <Ionicons name="shield-checkmark" size={16} color="#a8d0ff" />
+              <Ionicons
+                name="shield-checkmark"
+                size={16}
+                color={Colors.accentBlue}
+              />
               <View style={styles.dividerLine} />
             </View>
           </View>
@@ -274,7 +279,9 @@ const StartedScreen = () => {
                   styles.indicatorLine,
                   {
                     backgroundColor:
-                      index === activeIndex ? '#0f2b46' : '#cbd5e0',
+                      index === activeIndex
+                        ? Colors.indicatorActive
+                        : Colors.indicatorInactive,
                     width: index === activeIndex ? 30 : 20,
                   },
                 ]}
@@ -295,13 +302,13 @@ const StartedScreen = () => {
           <TouchableOpacity
             style={styles.getStartedButton}
             onPress={() => {
-              // Handle get started action
-              console.log('Get Started pressed!');
+              // Handle get started actions
+              navigation.navigate('Login');
             }}
             activeOpacity={0.7}
           >
             <Text style={styles.getStartedText}>Get Started</Text>
-            <Ionicons name="arrow-forward" size={22} color="white" />
+            <Ionicons name="arrow-forward" size={22} color={Colors.white} />
           </TouchableOpacity>
         </Animated.View>
       )}
@@ -312,7 +319,7 @@ const StartedScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: Colors.lightBackground,
   },
   header: {
     paddingHorizontal: 20,
@@ -320,7 +327,7 @@ const styles = StyleSheet.create({
     paddingBottom: 25,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
     shadowRadius: 15,
@@ -336,9 +343,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: 'transparent',
     opacity: 0.05,
-    backgroundImage: `radial-gradient(circle at 25% 25%, #a8d0ff 2%, transparent 10%),
-                      radial-gradient(circle at 75% 75%, #a8d0ff 2%, transparent 10%)`,
-    backgroundSize: '30px 30px',
   },
   cornerAccentTopLeft: {
     position: 'absolute',
@@ -351,7 +355,7 @@ const styles = StyleSheet.create({
     borderRightWidth: 60,
     borderTopWidth: 60,
     borderRightColor: 'transparent',
-    borderTopColor: 'rgba(168, 208, 255, 0.1)',
+    borderTopColor: Colors.transparentBlue10,
   },
   cornerAccentTopRight: {
     position: 'absolute',
@@ -364,7 +368,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 60,
     borderTopWidth: 60,
     borderLeftColor: 'transparent',
-    borderTopColor: 'rgba(168, 208, 255, 0.1)',
+    borderTopColor: Colors.transparentBlue10,
   },
   headerContent: {
     flexDirection: 'row',
@@ -372,10 +376,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   logoContainer: {
-    backgroundColor: 'white',
+    backgroundColor: Colors.white,
     borderRadius: 20,
     padding: 10,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -395,8 +399,7 @@ const styles = StyleSheet.create({
     width: '50%',
     height: '50%',
     borderRadius: 100,
-    backgroundColor: 'rgba(168, 208, 255, 0.4)',
-    filter: 'blur(10px)',
+    backgroundColor: Colors.transparentBlue40,
     zIndex: 1,
   },
   headerTextContainer: {
@@ -407,9 +410,9 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 26,
     fontFamily: 'Inter-Bold',
-    color: '#fff',
+    color: Colors.white,
     marginBottom: 5,
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowColor: Colors.transparentBlack30,
     textShadowOffset: { width: 1, height: 2 },
     textShadowRadius: 4,
     letterSpacing: 0.5,
@@ -417,7 +420,7 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     fontSize: 16,
     fontFamily: 'Inter-Medium',
-    color: '#a8d0ff',
+    color: Colors.accentBlue,
     letterSpacing: 0.8,
     marginBottom: 12,
   },
@@ -429,35 +432,17 @@ const styles = StyleSheet.create({
   dividerLine: {
     height: 1,
     width: 40,
-    backgroundColor: 'rgba(168, 208, 255, 0.4)',
+    backgroundColor: Colors.transparentBlue40,
     marginHorizontal: 8,
   },
-  taglineContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 159, 67, 0.15)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 15,
-    marginTop: 5,
-  },
-  taglineText: {
-    fontSize: 12,
-    fontFamily: 'Inter-Medium',
-    color: '#ffd8b8',
-    marginHorizontal: 6,
-  },
   headerBadge: {
-    // position: 'absolute',
-    // top: 15,
-    // right: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 159, 67, 0.9)',
+    backgroundColor: Colors.transparentOrange90,
     borderRadius: 12,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -466,7 +451,7 @@ const styles = StyleSheet.create({
   headerBadgeText: {
     fontSize: 12,
     fontFamily: 'Inter-SemiBold',
-    color: '#fff',
+    color: Colors.white,
     marginLeft: 4,
   },
   flatListContainer: {
@@ -489,14 +474,14 @@ const styles = StyleSheet.create({
   infoTitle: {
     fontSize: 22,
     fontFamily: 'Inter-SemiBold',
-    color: '#2D3748',
+    color: Colors.textDark,
     marginBottom: 10,
     textAlign: 'center',
   },
   infoText: {
     fontSize: 16,
     fontFamily: 'Inter-Regular',
-    color: '#718096',
+    color: Colors.textGray,
     lineHeight: 22,
     textAlign: 'center',
     marginBottom: 10,
@@ -505,13 +490,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   featureItem: {
-    backgroundColor: '#fff',
+    backgroundColor: Colors.white,
     borderRadius: 10,
     padding: 12,
     alignItems: 'center',
     margin: 5,
     width: WIDTH / 2 - 30,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -531,14 +516,14 @@ const styles = StyleSheet.create({
   featureTitle: {
     fontSize: 14,
     fontFamily: 'Inter-SemiBold',
-    color: '#2D3748',
+    color: Colors.textDark,
     marginBottom: 4,
     textAlign: 'center',
   },
   featureDesc: {
     fontSize: 12,
     fontFamily: 'Inter-Regular',
-    color: '#718096',
+    color: Colors.textGray,
     textAlign: 'center',
   },
   indicatorContainer: {
@@ -554,7 +539,6 @@ const styles = StyleSheet.create({
     height: 4,
     borderRadius: 2,
     marginHorizontal: 3,
-    transition: 'width 0.3s ease',
   },
   getStartedContainer: {
     paddingHorizontal: 40,
@@ -562,14 +546,14 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   getStartedButton: {
-    backgroundColor: '#0f2b46',
+    backgroundColor: Colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 15,
     paddingHorizontal: 25,
     borderRadius: 30,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -578,7 +562,7 @@ const styles = StyleSheet.create({
   getStartedText: {
     fontSize: 18,
     fontFamily: 'Inter-SemiBold',
-    color: 'white',
+    color: Colors.white,
     marginRight: 10,
   },
 });
