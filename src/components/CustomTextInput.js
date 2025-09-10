@@ -1,8 +1,18 @@
+// components/CustomTextInput.js
 import React from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Text,
+} from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
+import { Colors } from '../config/Colors';
+import { GlobalFonts } from '../config/GlobalFonts';
 
 const CustomTextInput = ({
+  label,
   iconName,
   placeholder,
   value,
@@ -12,68 +22,99 @@ const CustomTextInput = ({
   isPassword = false,
   showPassword = false,
   togglePasswordVisibility = () => {},
+  error = null,
+  keyboardType = 'default',
+  maxLength,
+  editable = true,
+  ...props
 }) => {
   return (
-    <View style={styles.inputContainer}>
-      <Ionicons
-        name={iconName}
-        size={20}
-        color="#2c6c8c"
-        style={styles.inputIcon}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder={placeholder}
-        placeholderTextColor="#7a9eb5"
-        value={value}
-        onChangeText={onChangeText}
-        secureTextEntry={secureTextEntry}
-        autoCapitalize={autoCapitalize}
-      />
-      {isPassword && (
-        <TouchableOpacity
-          onPress={togglePasswordVisibility}
-          style={styles.eyeIcon}
-        >
+    <View style={styles.inputGroup}>
+      {label && <Text style={styles.label}>{label}</Text>}
+      <View style={[styles.inputContainer, error && styles.inputError]}>
+        {iconName && (
           <Ionicons
-            name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+            name={iconName}
             size={20}
-            color="#2c6c8c"
+            color={error ? Colors.error : Colors.primaryBlue}
+            style={styles.inputIcon}
           />
-        </TouchableOpacity>
-      )}
+        )}
+        <TextInput
+          style={[styles.input, !editable && styles.disabledInput]}
+          placeholder={placeholder}
+          placeholderTextColor={Colors.textMediumGray}
+          value={value}
+          onChangeText={onChangeText}
+          secureTextEntry={isPassword ? !showPassword : false}
+          autoCapitalize={autoCapitalize}
+          keyboardType={keyboardType}
+          maxLength={maxLength}
+          editable={editable}
+          {...props}
+        />
+        {isPassword && (
+          <TouchableOpacity
+            onPress={togglePasswordVisibility}
+            style={styles.eyeIcon}
+          >
+            <Ionicons
+              name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+              size={20}
+              color={error ? Colors.error : Colors.primaryBlue}
+            />
+          </TouchableOpacity>
+        )}
+      </View>
+      {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  inputGroup: {
+    marginBottom: 20,
+  },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1.5,
-    borderColor: '#e1e8f0',
+    borderColor: Colors.borderLight,
     borderRadius: 12,
-    marginBottom: 18,
     paddingHorizontal: 15,
     height: 55,
-    backgroundColor: '#fafbfc',
-    shadowColor: '#0d2b4b',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  inputIcon: {
-    marginRight: 12,
+    backgroundColor: Colors.white,
   },
   input: {
     flex: 1,
     height: '100%',
     fontSize: 16,
-    color: '#0d2b4b',
+    color: Colors.textDark,
+    fontFamily: GlobalFonts.textMedium,
+  },
+  disabledInput: {
+    backgroundColor: Colors.lightBackground,
+    color: Colors.textMediumGray,
+  },
+  inputIcon: {
+    marginRight: 12,
   },
   eyeIcon: {
     padding: 5,
+  },
+  inputError: {
+    borderColor: Colors.error,
+  },
+  errorText: {
+    color: Colors.error,
+    fontSize: 12,
+    marginTop: 5,
+    fontFamily: GlobalFonts.textLight,
+  },
+  label: {
+    fontSize: 14,
+    fontFamily: GlobalFonts.textSemiBold,
+    color: Colors.textDark,
   },
 });
 

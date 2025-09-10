@@ -2,7 +2,6 @@ import { StyleSheet } from 'react-native';
 
 export const GlobalFonts = StyleSheet.create({
   textLight: 'Inter-Light',
-  textRegular: 'Inter-Regular',
   textMedium: 'Inter-Medium',
   textSemiBold: 'Inter-SemiBold',
   textBold: 'Inter-Bold',

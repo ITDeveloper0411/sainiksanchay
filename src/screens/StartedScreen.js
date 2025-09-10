@@ -11,10 +11,12 @@ import {
   Easing,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Ionicons from '@react-native-vector-icons/ionicons';
 import { LinearGradient } from 'react-native-linear-gradient';
 import { LOGO, WIDTH } from '../config/Constant';
 import { Colors } from '../config/Colors';
+
+import Ionicons from '@react-native-vector-icons/ionicons';
+import { GlobalFonts } from '../config/GlobalFonts';
 
 const StartedScreen = ({ navigation }) => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -409,7 +411,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 26,
-    fontFamily: 'Inter-Bold',
+    fontFamily: GlobalFonts.textBoldItalic,
     color: Colors.white,
     marginBottom: 5,
     textShadowColor: Colors.transparentBlack30,
@@ -419,7 +421,7 @@ const styles = StyleSheet.create({
   },
   headerSubtitle: {
     fontSize: 16,
-    fontFamily: 'Inter-Medium',
+    fontFamily: GlobalFonts.textMediumItalic,
     color: Colors.accentBlue,
     letterSpacing: 0.8,
     marginBottom: 12,
@@ -450,7 +452,7 @@ const styles = StyleSheet.create({
   },
   headerBadgeText: {
     fontSize: 12,
-    fontFamily: 'Inter-SemiBold',
+    fontFamily: GlobalFonts.textSemiBold,
     color: Colors.white,
     marginLeft: 4,
   },
@@ -473,14 +475,14 @@ const styles = StyleSheet.create({
   },
   infoTitle: {
     fontSize: 22,
-    fontFamily: 'Inter-SemiBold',
+    fontFamily: GlobalFonts.textSemiBoldItalic,
     color: Colors.textDark,
     marginBottom: 10,
     textAlign: 'center',
   },
   infoText: {
-    fontSize: 16,
-    fontFamily: 'Inter-Regular',
+    fontSize: 14,
+    fontFamily: GlobalFonts.textLightItalic,
     color: Colors.textGray,
     lineHeight: 22,
     textAlign: 'center',
@@ -515,14 +517,14 @@ const styles = StyleSheet.create({
   },
   featureTitle: {
     fontSize: 14,
-    fontFamily: 'Inter-SemiBold',
+    fontFamily: GlobalFonts.textSemiBoldItalic,
     color: Colors.textDark,
     marginBottom: 4,
     textAlign: 'center',
   },
   featureDesc: {
     fontSize: 12,
-    fontFamily: 'Inter-Regular',
+    fontFamily: GlobalFonts.textLightItalic,
     color: Colors.textGray,
     textAlign: 'center',
   },
@@ -561,7 +563,7 @@ const styles = StyleSheet.create({
   },
   getStartedText: {
     fontSize: 18,
-    fontFamily: 'Inter-SemiBold',
+    fontFamily: GlobalFonts.textBoldItalic,
     color: Colors.white,
     marginRight: 10,
   },

@@ -9,10 +9,10 @@ import Loader from '../components/Loader';
 import { AUTH_TOKEN } from '../config/Constant';
 
 const MainNavigator = () => {
+  const { token } = useSelector(state => state.auth);
   const isMountedRef = useRef(false);
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
-  const { token } = useSelector(state => state.auth);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -22,7 +22,6 @@ const MainNavigator = () => {
 
       if (accessToken) {
         dispatch(authActions.setToken(accessToken));
-        // dispatch(profileActions.getProfile());
       }
       if (isMountedRef.current) {
         setLoading(false);
@@ -32,6 +31,10 @@ const MainNavigator = () => {
     return () => {
       isMountedRef.current = false;
     };
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(authActions.getStates());
   }, [dispatch]);
 
   if (loading) {

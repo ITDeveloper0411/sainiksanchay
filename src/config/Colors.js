@@ -10,6 +10,7 @@ export const Colors = {
   darkBlue: '#2c6c8c',
   white: '#fff',
   lightBackground: '#f5f7fa',
+  error: '#FF0000',
 
   // Feature card background colors
   featureBlue: '#EBF5FF',
@@ -38,6 +39,9 @@ export const Colors = {
 
   // Success colors
   success: '#10b981',
+
+  // Warning colors
+  warning: '#ffcc00',
 
   // Shadow colors
   shadow: '#000',

@@ -2,11 +2,6 @@ import React, { useState, createContext, useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import BottomNavigation from '../components/BottomNavigation';
 import HomeScreen from '../screens/HomeScreen';
-// import HomeScreen from '../screens/Home/HomeScreen';
-// import CartScreen from '../screens/Cart/CartScreen';
-// import AccountScreen from '../screens/Account/AccountScreen';
-// import CategoryScreen from '../screens/Category/CategoryScreen';
-// import SearchScreen from '../screens/SearchScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -33,10 +28,6 @@ const BottomTabNavigator = () => {
         screenOptions={{ headerShown: false }}
       >
         <Tab.Screen name="Home" component={HomeScreen} />
-        {/*<Tab.Screen name="Explore" component={SearchScreen} />*/}
-        {/*<Tab.Screen name="Category" component={CategoryScreen} />*/}
-        {/*<Tab.Screen name="Cart" component={CartScreen} />*/}
-        {/*<Tab.Screen name="Account" component={AccountScreen} />*/}
       </Tab.Navigator>
     </TabBarVisibilityContext.Provider>
   );

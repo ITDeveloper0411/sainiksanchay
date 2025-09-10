@@ -6,36 +6,66 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Alert,
   StatusBar,
   Image,
   TouchableOpacity,
+  ToastAndroid,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { GlobalFonts } from '../../config/GlobalFonts';
-import CustomTextInput from '../../components/CustomTextInput';
-import CustomButton from '../../components/CustomButton';
 import { LOGO } from '../../config/Constant';
 import { Colors } from '../../config/Colors';
+import * as authActions from '../../store/actions/auth';
 
-export default function LoginScreen() {
+import CustomTextInput from '../../components/CustomTextInput';
+import CustomButton from '../../components/CustomButton';
+import { useDispatch } from 'react-redux';
+
+export default function LoginScreen({ navigation }) {
+  const dispatch = useDispatch();
+
+  const [isLoading, setIsLoading] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
 
-  const handleLogin = () => {
-    if (!username || !password) {
-      Alert.alert('Error', 'Please enter both username and password');
-      return;
-    }
-    // Handle login logic here
-    Alert.alert('Success', 'Login successful!');
+  const showToast = message => {
+    ToastAndroid.show(message, ToastAndroid.SHORT);
   };
 
-  const toggleRememberMe = () => {
-    setRememberMe(!rememberMe);
+  const validateSection = () => {
+    const errors = {};
+
+    if (!username) errors.username = 'Username is required';
+    if (!password) errors.password = 'Password is required';
+
+    setFormErrors(errors);
+
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleLogin = async () => {
+    if (!validateSection()) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const result = await dispatch(authActions.login(username, password));
+
+      if (result.success) {
+      } else {
+        showToast(result.message || 'Registration failed. Please try again.');
+      }
+    } catch (error) {
+      showToast(
+        'Registration failed: ' + (error.message || 'Please try again'),
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -78,7 +108,7 @@ export default function LoginScreen() {
             <View style={styles.formContainer}>
               <Text style={styles.loginText}>Secure Login</Text>
               <Text style={styles.welcomeSubtext}>
-                Access your loan account securely
+                Access your account securely
               </Text>
 
               {/* Username Input */}
@@ -88,6 +118,7 @@ export default function LoginScreen() {
                 value={username}
                 onChangeText={setUsername}
                 autoCapitalize="none"
+                error={formErrors.username}
               />
 
               {/* Password Input */}
@@ -100,35 +131,18 @@ export default function LoginScreen() {
                 isPassword={true}
                 showPassword={showPassword}
                 togglePasswordVisibility={togglePasswordVisibility}
+                error={formErrors.password}
               />
 
-              {/* Remember Me & Forgot Password */}
-              <View style={styles.rememberContainer}>
-                <TouchableOpacity
-                  onPress={toggleRememberMe}
-                  style={styles.rememberCheck}
-                >
-                  <View
-                    style={[styles.checkbox, rememberMe && styles.checkedBox]}
-                  >
-                    {rememberMe && (
-                      <Ionicons
-                        name="checkmark"
-                        size={16}
-                        color={Colors.white}
-                      />
-                    )}
-                  </View>
-                  <Text style={styles.rememberText}>Remember me</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity>
-                  <Text style={styles.forgotText}>Forgot Password?</Text>
-                </TouchableOpacity>
-              </View>
-
               {/* Login Button with financial app styling */}
-              <CustomButton title="Access My Account" onPress={handleLogin} />
+
+              <CustomButton
+                title={isLoading ? 'Authenticating...' : 'Access My Account'}
+                onPress={handleLogin}
+                variant="primary"
+                loading={isLoading}
+                disabled={isLoading}
+              />
 
               {/* Security Features */}
               <View style={styles.securityContainer}>
@@ -153,8 +167,10 @@ export default function LoginScreen() {
               {/* Sign Up Link */}
               <View style={styles.signupContainer}>
                 <Text style={styles.signupText}>New to Sainik Sanchay? </Text>
-                <TouchableOpacity>
-                  <Text style={styles.signupLink}>Apply for a Loan</Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('Register')}
+                >
+                  <Text style={styles.signupLink}>Register Here</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -175,22 +191,14 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    paddingBottom: 20,
+    paddingBottom: 30,
   },
   header: {
     backgroundColor: Colors.primaryBlue,
     alignItems: 'center',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 20 : 40,
-    paddingBottom: 40,
-    paddingHorizontal: 20,
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
-    marginBottom: 20,
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.2,
-    shadowRadius: 15,
-    elevation: 10,
+    padding: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
   },
   logoContainer: {
     width: 100,
@@ -199,12 +207,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 15,
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 5,
+    marginBottom: 10,
   },
   logoImage: {
     width: 80,
@@ -218,14 +221,14 @@ const styles = StyleSheet.create({
     textShadowColor: Colors.transparentBlack30,
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
-    fontFamily: GlobalFonts.textBold,
+    fontFamily: GlobalFonts.textBoldItalic,
   },
   subtitle: {
     fontSize: 14,
     color: Colors.lightBlue,
     textAlign: 'center',
     paddingHorizontal: 20,
-    fontFamily: GlobalFonts.textSemiBold,
+    fontFamily: GlobalFonts.textSemiBoldItalic,
   },
   formWrapper: {
     marginHorizontal: 20,
@@ -243,11 +246,12 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.transparentBlue15,
     borderRadius: 20,
     zIndex: 1,
+    marginTop: 20,
   },
   formContainer: {
     backgroundColor: Colors.white,
     paddingHorizontal: 25,
-    paddingVertical: 10,
+    paddingVertical: 20,
     borderRadius: 20,
     zIndex: 2,
     borderWidth: 1,
@@ -260,6 +264,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 10,
     elevation: 8,
+    marginTop: 20,
   },
   loginText: {
     fontSize: 24,
@@ -301,7 +306,7 @@ const styles = StyleSheet.create({
   rememberText: {
     color: Colors.textLightGray,
     fontSize: 12,
-    fontFamily: GlobalFonts.textRegular,
+    fontFamily: GlobalFonts.textLight,
   },
   forgotText: {
     color: Colors.darkBlue,
@@ -326,7 +331,7 @@ const styles = StyleSheet.create({
   securityText: {
     color: Colors.textLightGray,
     fontSize: 14,
-    fontFamily: GlobalFonts.textLight,
+    fontFamily: GlobalFonts.textLightItalic,
   },
   signupContainer: {
     flexDirection: 'row',
@@ -334,12 +339,12 @@ const styles = StyleSheet.create({
   },
   signupText: {
     color: Colors.textGray,
-    fontSize: 15,
-    fontFamily: GlobalFonts.textLight,
+    fontSize: 12,
+    fontFamily: GlobalFonts.textLightItalic,
   },
   signupLink: {
     color: Colors.primaryBlue,
-    fontSize: 15,
-    fontFamily: GlobalFonts.textBold,
+    fontSize: 12,
+    fontFamily: GlobalFonts.textBoldItalic,
   },
 });

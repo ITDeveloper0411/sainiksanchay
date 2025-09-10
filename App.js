@@ -3,7 +3,7 @@ import MainNavigator from './src/navigation/MainNavigator';
 import { Provider } from 'react-redux';
 import store from './src/store/store';
 
-import { SafeAreaProvider } from 'react-native-safe-area-context'; // ✅ added
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 function App() {
   return (
