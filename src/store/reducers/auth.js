@@ -8,8 +8,8 @@ import {
   LOGOUT,
   REGISTER,
 } from '../actions/auth';
-import { ToastAndroid } from 'react-native';
 import { AUTH_TOKEN } from '../../config/Constant';
+import { ShowToast } from '../../components/ShowToast';
 
 const initialState = {
   registered: false,
@@ -57,7 +57,7 @@ export default (state = initialState, action) => {
 
     case LOGOUT:
       AsyncStorage.removeItem(AUTH_TOKEN);
-      ToastAndroid.show('Logout Successfully !', ToastAndroid.SHORT);
+      ShowToast('Logout Successfully !');
       return { ...initialState };
     default:
       return state;

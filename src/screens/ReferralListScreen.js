@@ -1,125 +1,280 @@
 // screens/ReferralListScreen.js
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Share,
+  RefreshControl,
+  Dimensions,
 } from 'react-native';
 import { GlobalFonts } from '../config/GlobalFonts';
 import { Colors } from '../config/Colors';
+import * as referralActions from '../store/actions/referral';
+import { useDispatch, useSelector } from 'react-redux';
+import { ShowToast } from '../components/ShowToast';
+import Icon from '@react-native-vector-icons/material-icons';
+import BackHeader from '../components/BackHeader';
+import { ANDROID_PACKAGE_NAME } from '../config/Constant';
+import Loader from '../components/Loader';
 
-const ReferralListScreen = () => {
-  // Sample team/referral list data
-  const teamData = [
-    {
-      id: '1',
-      name: 'John Doe',
-      joinDate: '2023-10-15',
-      level: 'Level 1',
-      status: 'Active',
-    },
-    {
-      id: '2',
-      name: 'Jane Smith',
-      joinDate: '2023-10-14',
-      level: 'Level 2',
-      status: 'Active',
-    },
-    {
-      id: '3',
-      name: 'Robert Johnson',
-      joinDate: '2023-10-13',
-      level: 'Level 1',
-      status: 'Inactive',
-    },
-    {
-      id: '4',
-      name: 'Sarah Wilson',
-      joinDate: '2023-10-12',
-      level: 'Level 3',
-      status: 'Active',
-    },
-    {
-      id: '5',
-      name: 'Michael Brown',
-      joinDate: '2023-10-11',
-      level: 'Level 1',
-      status: 'Active',
-    },
-    {
-      id: '6',
-      name: 'Emily Davis',
-      joinDate: '2023-10-10',
-      level: 'Level 2',
-      status: 'Inactive',
-    },
-  ];
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-  const activeMembers = teamData.filter(
-    member => member.status === 'Active',
-  ).length;
-  const totalMembers = teamData.length;
+const ReferralListScreen = ({ navigation }) => {
+  const dispatch = useDispatch();
+  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [showStats, setShowStats] = useState(true);
+  const { profile } = useSelector(state => state.profile);
+  const {
+    referralList,
+    totalMember,
+    totalPendingMember,
+    totalActiveMember,
+    totalRejectedMember,
+  } = useSelector(state => state.referral);
+
+  const getReferralList = useCallback(async () => {
+    setLoading(true);
+    try {
+      await dispatch(referralActions.getReferralList());
+    } catch (error) {
+      ShowToast('Failed to fetch referral list');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [dispatch]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await getReferralList();
+  }, [getReferralList]);
+
+  useEffect(() => {
+    getReferralList();
+  }, [getReferralList]);
+
+  const shareReferralCode = async () => {
+    try {
+      const appLink = `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE_NAME}`;
+      const referralMessage = `🌟 Join me on Sainik Sanchay! 🌟
+
+Use my referral (SAM) code: ${profile?.username || 'N/A'}
+
+Download the app now: ${appLink}
+
+Let's grow together! 💪
+
+#SainikSanchay #Referral`;
+
+      const shareOptions = {
+        message: referralMessage,
+        title: 'Join Sainik Sanchay - Refer a Friend',
+      };
+
+      await Share.share(shareOptions);
+    } catch (error) {
+      ShowToast('Error sharing referral code');
+    }
+  };
+
+  const getStatusStyle = status => {
+    switch (status) {
+      case 'APPROVED':
+        return [styles.statusIndicator, styles.statusApproved];
+      case 'PENDING':
+        return [styles.statusIndicator, styles.statusPending];
+      case 'REJECTED':
+        return [styles.statusIndicator, styles.statusRejected];
+      default:
+        return [styles.statusIndicator, styles.statusPending];
+    }
+  };
+
+  const getStatusText = status => {
+    switch (status) {
+      case 'APPROVED':
+        return 'Approved';
+      case 'PENDING':
+        return 'Pending';
+      case 'REJECTED':
+        return 'Rejected';
+      default:
+        return 'Pending';
+    }
+  };
+
+  // Updated Stat Card with equal width
+  const StatCard = ({ icon, number, label, color }) => (
+    <View style={[styles.statCard, { backgroundColor: color + '15' }]}>
+      <View style={styles.statTop}>
+        <Icon name={icon} size={16} color={color} />
+        <Text style={[styles.statNumber, { color }]}>{number || 0}</Text>
+      </View>
+      <Text style={[styles.statLabel, { color }]} numberOfLines={1}>
+        {label}
+      </Text>
+    </View>
+  );
+
+  if (loading) {
+    return <Loader />;
+  }
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Team</Text>
-      </View>
+      {/* Custom Header */}
+      <BackHeader
+        title="My Referral"
+        onBackPress={() => navigation.goBack()}
+        backgroundColor={Colors.primaryBlue}
+        rightComponent={
+          <TouchableOpacity
+            onPress={() => setShowStats(!showStats)}
+            style={styles.toggleButton}
+          >
+            <Icon
+              name={showStats ? 'visibility' : 'visibility-off'}
+              size={22}
+              color={Colors.white}
+            />
+          </TouchableOpacity>
+        }
+      />
 
-      <View style={styles.statsContainer}>
-        <View style={styles.statCard}>
-          <Text style={styles.statNumber}>{totalMembers}</Text>
-          <Text style={styles.statLabel}>Total Members</Text>
-        </View>
-
-        <View style={styles.statCard}>
-          <Text style={styles.statNumber}>{activeMembers}</Text>
-          <Text style={styles.statLabel}>Active Members</Text>
-        </View>
-
-        <View style={styles.statCard}>
-          <Text style={styles.statNumber}>{totalMembers - activeMembers}</Text>
-          <Text style={styles.statLabel}>Inactive Members</Text>
-        </View>
-      </View>
-
-      <ScrollView style={styles.listContainer}>
-        <Text style={styles.listTitle}>Team Members</Text>
-
-        {teamData.map(member => (
-          <View key={member.id} style={styles.memberItem}>
-            <View style={styles.memberAvatar}>
-              <Text style={styles.avatarText}>
-                {member.name.charAt(0).toUpperCase()}
-              </Text>
-            </View>
-
-            <View style={styles.memberInfo}>
-              <Text style={styles.memberName}>{member.name}</Text>
-              <Text style={styles.memberDetails}>
-                Joined: {member.joinDate} • {member.level}
-              </Text>
-            </View>
-
-            <View
-              style={[
-                styles.statusIndicator,
-                member.status === 'Active'
-                  ? styles.statusActive
-                  : styles.statusInactive,
-              ]}
-            >
-              <Text style={styles.statusText}>{member.status}</Text>
-            </View>
+      {/* Statistics Section - Fixed to single row with equal width */}
+      {showStats && (
+        <View style={styles.statsSection}>
+          <View style={styles.statsContainer}>
+            <StatCard
+              icon="people"
+              number={totalMember || 0}
+              label="Total"
+              color={Colors.primaryBlue}
+            />
+            <StatCard
+              icon="check-circle"
+              number={totalActiveMember || 0}
+              label="Active"
+              color={Colors.success}
+            />
+            <StatCard
+              icon="schedule"
+              number={totalPendingMember || 0}
+              label="Pending"
+              color={Colors.warning}
+            />
+            <StatCard
+              icon="cancel"
+              number={totalRejectedMember || 0}
+              label="Rejected"
+              color={Colors.error}
+            />
           </View>
-        ))}
-      </ScrollView>
+        </View>
+      )}
 
-      <TouchableOpacity style={styles.inviteButton}>
-        <Text style={styles.inviteButtonText}>Invite to Team</Text>
-      </TouchableOpacity>
+      {/* Header with count and invite button */}
+      <View style={styles.listHeaderContainer}>
+        <View>
+          <Text style={styles.listTitle}>Team Members</Text>
+          <Text style={styles.listSubtitle}>
+            {referralList?.length || 0} members found
+          </Text>
+        </View>
+        <TouchableOpacity
+          style={styles.inviteButtonSmall}
+          onPress={shareReferralCode}
+        >
+          <Icon name="share" size={18} color={Colors.primaryBlue} />
+          <Text style={styles.inviteButtonSmallText}>Invite</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Members List */}
+      <ScrollView
+        style={styles.listContainer}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[Colors.primaryBlue]}
+            tintColor={Colors.primaryBlue}
+          />
+        }
+      >
+        {referralList?.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Icon name="people-outline" size={60} color={Colors.textGray} />
+            <Text style={styles.emptyText}>No team members yet</Text>
+            <Text style={styles.emptySubtext}>
+              Start inviting people to build your team
+            </Text>
+            <TouchableOpacity
+              style={styles.emptyInviteButton}
+              onPress={shareReferralCode}
+            >
+              <Icon name="share" size={20} color={Colors.white} />
+              <Text style={styles.emptyInviteButtonText}>Invite Friends</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          referralList?.map((member, index) => (
+            <View key={member.id || index} style={styles.memberCard}>
+              <View style={styles.memberHeader}>
+                <View style={styles.memberAvatar}>
+                  <Text style={styles.avatarText}>
+                    {member.name?.charAt(0)?.toUpperCase() || 'U'}
+                  </Text>
+                </View>
+                <View style={styles.memberBasicInfo}>
+                  <Text style={styles.memberName} numberOfLines={1}>
+                    {member.name || 'N/A'}
+                  </Text>
+                  <Text style={styles.memberUsername}>
+                    @{member.username || 'N/A'}
+                  </Text>
+                </View>
+                <View style={getStatusStyle(member.payment_status)}>
+                  <Text style={styles.statusText}>
+                    {getStatusText(member.payment_status)}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.memberDetails}>
+                <View style={styles.detailRow}>
+                  <Icon name="phone" size={14} color={Colors.textLight} />
+                  <Text style={styles.detailText}>
+                    {member.mobile || 'N/A'}
+                  </Text>
+                </View>
+
+                {member.emailid ? (
+                  <View style={styles.detailRow}>
+                    <Icon name="email" size={14} color={Colors.textLight} />
+                    <Text style={styles.detailText} numberOfLines={1}>
+                      {member.emailid}
+                    </Text>
+                  </View>
+                ) : null}
+
+                <View style={styles.detailRow}>
+                  <Icon name="location-on" size={14} color={Colors.textLight} />
+                  <Text style={styles.detailText} numberOfLines={1}>
+                    {[member.district, member.state]
+                      .filter(Boolean)
+                      .join(', ') || 'N/A'}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          ))
+        )}
+      </ScrollView>
     </View>
   );
 };
@@ -129,116 +284,205 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.lightBackground,
   },
-  header: {
-    backgroundColor: Colors.primaryBlue,
-    padding: 20,
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: Colors.lightBackground,
   },
-  headerTitle: {
-    fontSize: 20,
-    color: Colors.white,
-    fontFamily: GlobalFonts.textBold,
+  loadingText: {
+    marginTop: 16,
+    fontSize: 14,
+    color: Colors.textGray,
+    fontFamily: GlobalFonts.textMedium,
+  },
+  toggleButton: {
+    padding: 5,
+  },
+  statsSection: {
+    backgroundColor: Colors.white,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.borderLight,
   },
   statsContainer: {
     flexDirection: 'row',
-    padding: 16,
-    backgroundColor: Colors.white,
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
   },
   statCard: {
-    flex: 1,
-    alignItems: 'center',
+    width: (SCREEN_WIDTH - 32 - 30) / 4, // Equal width with spacing
     padding: 12,
+    borderRadius: 10,
+    justifyContent: 'space-between',
+  },
+  statTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
   },
   statNumber: {
-    fontSize: 24,
-    color: Colors.primaryDark,
+    fontSize: 18,
     fontFamily: GlobalFonts.textBold,
-    marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: Colors.textGray,
     fontFamily: GlobalFonts.textMedium,
-    textAlign: 'center',
   },
-  listContainer: {
-    flex: 1,
-    padding: 16,
+  listHeaderContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: Colors.white,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.borderLight,
   },
   listTitle: {
     fontSize: 18,
     color: Colors.textDark,
     fontFamily: GlobalFonts.textBold,
-    marginBottom: 16,
   },
-  memberItem: {
+  listSubtitle: {
+    fontSize: 12,
+    color: Colors.textGray,
+    fontFamily: GlobalFonts.textMedium,
+  },
+  inviteButtonSmall: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.primaryBlue + '15',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    gap: 4,
+  },
+  inviteButtonSmallText: {
+    color: Colors.primaryBlue,
+    fontSize: 12,
+    fontFamily: GlobalFonts.textSemiBold,
+  },
+  listContainer: {
+    flex: 1,
     padding: 16,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 40,
+    backgroundColor: Colors.white,
     borderRadius: 12,
+    marginTop: 20,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: Colors.textDark,
+    fontFamily: GlobalFonts.textSemiBold,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: Colors.textGray,
+    fontFamily: GlobalFonts.textMedium,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 20,
+  },
+  emptyInviteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.primaryBlue,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    gap: 6,
+  },
+  emptyInviteButtonText: {
+    color: Colors.white,
+    fontSize: 14,
+    fontFamily: GlobalFonts.textSemiBold,
+  },
+  memberCard: {
+    backgroundColor: Colors.white,
+    padding: 12,
+    borderRadius: 10,
     marginBottom: 12,
     shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: 3,
     elevation: 2,
+  },
+  memberHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
   },
   memberAvatar: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: Colors.primaryLight,
+    backgroundColor: Colors.primaryBlue,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 10,
   },
   avatarText: {
-    color: Colors.primaryDark,
+    color: Colors.white,
     fontSize: 16,
     fontFamily: GlobalFonts.textBold,
   },
-  memberInfo: {
+  memberBasicInfo: {
     flex: 1,
   },
   memberName: {
-    fontSize: 16,
+    fontSize: 15,
     color: Colors.textDark,
     fontFamily: GlobalFonts.textSemiBold,
-    marginBottom: 4,
+    marginBottom: 2,
   },
-  memberDetails: {
+  memberUsername: {
     fontSize: 12,
     color: Colors.textGray,
     fontFamily: GlobalFonts.textMedium,
   },
   statusIndicator: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
   },
-  statusActive: {
-    backgroundColor: Colors.successLight,
+  statusApproved: {
+    backgroundColor: Colors.success + '20',
   },
-  statusInactive: {
-    backgroundColor: Colors.warningLight,
+  statusPending: {
+    backgroundColor: Colors.warning + '20',
+  },
+  statusRejected: {
+    backgroundColor: Colors.error + '20',
   },
   statusText: {
-    fontSize: 10,
+    fontSize: 11,
     fontFamily: GlobalFonts.textMedium,
-    color: Colors.textDark,
   },
-  inviteButton: {
-    backgroundColor: Colors.primaryBlue,
-    margin: 16,
-    padding: 16,
-    borderRadius: 12,
+  memberDetails: {
+    borderTopWidth: 1,
+    borderTopColor: Colors.borderLight,
+    paddingTop: 10,
+  },
+  detailRow: {
+    flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 6,
   },
-  inviteButtonText: {
-    color: Colors.white,
-    fontSize: 16,
-    fontFamily: GlobalFonts.textSemiBold,
+  detailText: {
+    fontSize: 13,
+    color: Colors.textDark,
+    fontFamily: GlobalFonts.textMedium,
+    marginLeft: 8,
+    flex: 1,
   },
 });
 

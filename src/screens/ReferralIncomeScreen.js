@@ -1,234 +1,353 @@
 // screens/ReferralIncomeScreen.js
-import React, { useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { GlobalFonts } from '../config/GlobalFonts';
+import { useDispatch, useSelector } from 'react-redux';
+import * as referralActions from '../store/actions/referral';
+import { ShowToast } from '../components/ShowToast';
+import Loader from '../components/Loader';
 import { Colors } from '../config/Colors';
-import { useTabBarVisibility } from '../navigation/BottomTabNavigator';
+import BackHeader from '../components/BackHeader';
+import MonthYearPicker from '../components/MonthYearPicker';
 
-const ReferralIncomeScreen = () => {
-  const { showTabBar } = useTabBarVisibility();
+const ReferralIncomeScreen = ({ navigation }) => {
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [showMonthPicker, setShowMonthPicker] = useState(false);
+  const [showYearPicker, setShowYearPicker] = useState(false);
+
+  const { referralIncome } = useSelector(state => state.referral);
+
+  const incomeData = referralIncome || {
+    direct: { count: 0, amount: 0, current_count: 0, current_amount: 0 },
+    level1: { count: 0, amount: 0, current_count: 0, current_amount: 0 },
+    level2: { count: 0, amount: 0, current_count: 0, current_amount: 0 },
+    level3: { count: 0, amount: 0, current_count: 0, current_amount: 0 },
+    level4: { count: 0, amount: 0, current_count: 0, current_amount: 0 },
+  };
+
+  const getReferralList = useCallback(async () => {
+    setLoading(true);
+    try {
+      await dispatch(
+        referralActions.getReferralIncome(selectedMonth, selectedYear),
+      );
+    } catch (error) {
+      ShowToast('Failed to fetch referral income');
+    } finally {
+      setLoading(false);
+    }
+  }, [dispatch, selectedMonth, selectedYear]);
 
   useEffect(() => {
-    showTabBar();
-  }, [showTabBar]);
+    getReferralList();
+  }, [getReferralList]);
 
-  // Sample referral income data
-  const referralData = [
+  // Prepare table data
+  const tableData = [
     {
-      id: '1',
-      name: 'John Doe',
-      date: '2023-10-15',
-      amount: '₹500',
-      status: 'Completed',
+      level: 'Direct',
+      overallTeam: incomeData.direct.count,
+      overallAmount: `₹${incomeData.direct.amount.toFixed(2)}`,
+      currentTeam: incomeData.direct.current_count,
+      currentAmount: `₹${incomeData.direct.current_amount.toFixed(2)}`,
     },
     {
-      id: '2',
-      name: 'Jane Smith',
-      date: '2023-10-14',
-      amount: '₹300',
-      status: 'Pending',
+      level: 'SHG-1',
+      overallTeam: incomeData.level1.count,
+      overallAmount: `₹${incomeData.level1.amount.toFixed(2)}`,
+      currentTeam: incomeData.level1.current_count,
+      currentAmount: `₹${incomeData.level1.current_amount.toFixed(2)}`,
     },
     {
-      id: '3',
-      name: 'Robert Johnson',
-      date: '2023-10-13',
-      amount: '₹700',
-      status: 'Completed',
+      level: 'SHG-2',
+      overallTeam: incomeData.level2.count,
+      overallAmount: `₹${incomeData.level2.amount.toFixed(2)}`,
+      currentTeam: incomeData.level2.current_count,
+      currentAmount: `₹${incomeData.level2.current_amount.toFixed(2)}`,
     },
     {
-      id: '4',
-      name: 'Sarah Wilson',
-      date: '2023-10-12',
-      amount: '₹200',
-      status: 'Completed',
+      level: 'SHG-3',
+      overallTeam: incomeData.level3.count,
+      overallAmount: `₹${incomeData.level3.amount.toFixed(2)}`,
+      currentTeam: incomeData.level3.current_count,
+      currentAmount: `₹${incomeData.level3.current_amount.toFixed(2)}`,
     },
     {
-      id: '5',
-      name: 'Michael Brown',
-      date: '2023-10-11',
-      amount: '₹400',
-      status: 'Pending',
+      level: 'SHG-4',
+      overallTeam: incomeData.level4.count,
+      overallAmount: `₹${incomeData.level4.amount.toFixed(2)}`,
+      currentTeam: incomeData.level4.current_count,
+      currentAmount: `₹${incomeData.level4.current_amount.toFixed(2)}`,
     },
   ];
 
-  const totalEarnings = referralData
-    .filter(item => item.status === 'Completed')
-    .reduce((sum, item) => sum + parseInt(item.amount.replace('₹', '')), 0);
-
-  const pendingEarnings = referralData
-    .filter(item => item.status === 'Pending')
-    .reduce((sum, item) => sum + parseInt(item.amount.replace('₹', '')), 0);
+  if (loading) {
+    return <Loader />;
+  }
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Referral Income</Text>
-      </View>
+      <BackHeader
+        title="Referral Income"
+        onBackPress={() => navigation.goBack()}
+        backgroundColor={Colors.primaryBlue}
+      />
 
-      <View style={styles.summaryContainer}>
-        <View style={styles.summaryCard}>
-          <Text style={styles.summaryLabel}>Total Earnings</Text>
-          <Text style={styles.summaryAmount}>₹{totalEarnings}</Text>
+      {/* Filter Section */}
+      <View style={styles.filterContainer}>
+        <View style={styles.filterItem}>
+          <Text style={styles.filterLabel}>Month:</Text>
+          <MonthYearPicker
+            type="month"
+            value={selectedMonth}
+            visible={showMonthPicker}
+            onSelect={setSelectedMonth}
+            onClose={() => setShowMonthPicker(false)}
+            onOpen={() => setShowMonthPicker(true)}
+          />
         </View>
 
-        <View style={styles.summaryCard}>
-          <Text style={styles.summaryLabel}>Pending Earnings</Text>
-          <Text style={styles.summaryAmount}>₹{pendingEarnings}</Text>
+        <View style={styles.filterItem}>
+          <Text style={styles.filterLabel}>Year:</Text>
+          <MonthYearPicker
+            type="year"
+            value={selectedYear}
+            visible={showYearPicker}
+            onSelect={setSelectedYear}
+            onClose={() => setShowYearPicker(false)}
+            onOpen={() => setShowYearPicker(true)}
+          />
         </View>
       </View>
 
-      <ScrollView style={styles.listContainer}>
-        <Text style={styles.listTitle}>Recent Referrals</Text>
-
-        {referralData.map(item => (
-          <View key={item.id} style={styles.referralItem}>
-            <View style={styles.referralInfo}>
-              <Text style={styles.referralName}>{item.name}</Text>
-              <Text style={styles.referralDate}>{item.date}</Text>
+      {/* Table Container */}
+      <View style={styles.tableContainer}>
+        <View style={styles.tableWrapper}>
+          {/* Fixed Level Column */}
+          <View style={styles.fixedColumn}>
+            {/* Level Header - Merged cell spanning both header rows */}
+            <View style={[styles.headerCell, styles.levelHeaderCell]}>
+              <Text style={styles.headerText}>Level</Text>
             </View>
 
-            <View style={styles.referralAmountContainer}>
-              <Text style={styles.referralAmount}>{item.amount}</Text>
-              <Text
+            {/* Level Rows */}
+            {tableData.map((row, index) => (
+              <View
+                key={index}
                 style={[
-                  styles.statusBadge,
-                  item.status === 'Completed'
-                    ? styles.statusCompleted
-                    : styles.statusPending,
+                  styles.bodyCell,
+                  styles.levelCell,
+                  index % 2 === 0 ? styles.evenRow : styles.oddRow,
                 ]}
               >
-                {item.status}
-              </Text>
-            </View>
+                <Text style={styles.levelText}>{row.level}</Text>
+              </View>
+            ))}
           </View>
-        ))}
-      </ScrollView>
 
-      <TouchableOpacity style={styles.shareButton}>
-        <Text style={styles.shareButtonText}>Share Referral Code</Text>
-      </TouchableOpacity>
+          {/* Scrollable Content */}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View>
+              {/* Main Headers - Overall and Current Month */}
+              <View style={styles.scrollableHeader}>
+                <View style={[styles.headerCell, styles.dataGroupHeader]}>
+                  <Text style={styles.headerText}>Overall</Text>
+                </View>
+                <View style={[styles.headerCell, styles.dataGroupHeader]}>
+                  <Text style={styles.headerText}>Current Month</Text>
+                </View>
+              </View>
+
+              {/* Sub Headers */}
+              <View style={styles.scrollableSubHeader}>
+                {/* Overall Sub Headers */}
+                <View style={[styles.subHeaderCell, styles.teamColumn]}>
+                  <Text style={styles.subHeaderText}>Team</Text>
+                </View>
+                <View style={[styles.subHeaderCell, styles.amountColumn]}>
+                  <Text style={styles.subHeaderText}>Amount</Text>
+                </View>
+
+                {/* Current Month Sub Headers */}
+                <View style={[styles.subHeaderCell, styles.teamColumn]}>
+                  <Text style={styles.subHeaderText}>Team</Text>
+                </View>
+                <View style={[styles.subHeaderCell, styles.amountColumn]}>
+                  <Text style={styles.subHeaderText}>Amount</Text>
+                </View>
+              </View>
+
+              {/* Table Rows */}
+              <View style={styles.scrollableBody}>
+                {tableData.map((row, index) => (
+                  <View
+                    key={index}
+                    style={[
+                      styles.scrollableRow,
+                      index % 2 === 0 ? styles.evenRow : styles.oddRow,
+                    ]}
+                  >
+                    {/* Overall Data */}
+                    <View style={[styles.bodyCell, styles.teamColumn]}>
+                      <Text style={styles.bodyText}>{row.overallTeam}</Text>
+                    </View>
+                    <View style={[styles.bodyCell, styles.amountColumn]}>
+                      <Text style={styles.bodyText}>{row.overallAmount}</Text>
+                    </View>
+
+                    {/* Current Month Data */}
+                    <View style={[styles.bodyCell, styles.teamColumn]}>
+                      <Text style={styles.bodyText}>{row.currentTeam}</Text>
+                    </View>
+                    <View style={[styles.bodyCell, styles.amountColumn]}>
+                      <Text style={styles.bodyText}>{row.currentAmount}</Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            </View>
+          </ScrollView>
+        </View>
+      </View>
     </View>
   );
 };
+
+const { width } = Dimensions.get('window');
+const levelColumnWidth = 100;
+const teamColumnWidth = 80;
+const amountColumnWidth = 100;
+const headerHeight = 50;
+const subHeaderHeight = 40;
+const rowHeight = 50;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.lightBackground,
   },
-  header: {
-    backgroundColor: Colors.primaryBlue,
-    padding: 20,
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 20,
-    color: Colors.white,
-    fontFamily: GlobalFonts.textBold,
-  },
-  summaryContainer: {
-    flexDirection: 'row',
-    padding: 16,
-    backgroundColor: Colors.white,
-  },
-  summaryCard: {
-    flex: 1,
-    backgroundColor: Colors.lightBackground,
-    padding: 16,
-    borderRadius: 12,
-    marginHorizontal: 8,
-    alignItems: 'center',
-  },
-  summaryLabel: {
-    fontSize: 14,
-    color: Colors.textGray,
-    fontFamily: GlobalFonts.textMedium,
-    marginBottom: 8,
-  },
-  summaryAmount: {
-    fontSize: 20,
-    color: Colors.primaryDark,
-    fontFamily: GlobalFonts.textBold,
-  },
-  listContainer: {
-    flex: 1,
-    padding: 16,
-  },
-  listTitle: {
-    fontSize: 18,
-    color: Colors.textDark,
-    fontFamily: GlobalFonts.textBold,
-    marginBottom: 16,
-  },
-  referralItem: {
+  filterContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    padding: 16,
     backgroundColor: Colors.white,
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.borderLight,
   },
-  referralInfo: {
-    flex: 1,
-  },
-  referralName: {
-    fontSize: 16,
-    color: Colors.textDark,
-    fontFamily: GlobalFonts.textSemiBold,
-    marginBottom: 4,
-  },
-  referralDate: {
-    fontSize: 12,
-    color: Colors.textGray,
-    fontFamily: GlobalFonts.textMedium,
-  },
-  referralAmountContainer: {
-    alignItems: 'flex-end',
-  },
-  referralAmount: {
-    fontSize: 16,
-    color: Colors.primaryDark,
-    fontFamily: GlobalFonts.textBold,
-    marginBottom: 4,
-  },
-  statusBadge: {
-    fontSize: 12,
-    fontFamily: GlobalFonts.textMedium,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  statusCompleted: {
-    backgroundColor: Colors.success,
-    color: Colors.success,
-  },
-  statusPending: {
-    backgroundColor: Colors.warning,
-    color: Colors.warning,
-  },
-  shareButton: {
-    backgroundColor: Colors.primaryBlue,
-    margin: 16,
-    padding: 16,
-    borderRadius: 12,
+  filterItem: {
+    flexDirection: 'row',
     alignItems: 'center',
   },
-  shareButtonText: {
+  filterLabel: {
+    marginRight: 8,
+    fontFamily: GlobalFonts.textMedium,
+    color: Colors.textDark,
+    fontSize: 14,
+  },
+  tableContainer: {
+    margin: 16,
+    borderRadius: 8,
+    backgroundColor: Colors.white,
+    elevation: 2,
+    shadowColor: Colors.black,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    overflow: 'hidden',
+  },
+  tableWrapper: {
+    flexDirection: 'row',
+  },
+  fixedColumn: {
+    zIndex: 10,
+    elevation: 3,
+  },
+  levelHeaderCell: {
+    width: levelColumnWidth,
+    height: headerHeight + subHeaderHeight, // Combined height of main header + sub header
+    justifyContent: 'center',
+    backgroundColor: Colors.primaryBlue,
+  },
+  levelCell: {
+    width: levelColumnWidth,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: rowHeight,
+  },
+  headerCell: {
+    padding: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.primaryBlue,
+  },
+  headerText: {
     color: Colors.white,
-    fontSize: 16,
     fontFamily: GlobalFonts.textSemiBold,
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  scrollableHeader: {
+    flexDirection: 'row',
+    backgroundColor: Colors.primaryBlue,
+  },
+  dataGroupHeader: {
+    width: teamColumnWidth + amountColumnWidth,
+    height: headerHeight,
+  },
+  scrollableSubHeader: {
+    flexDirection: 'row',
+  },
+  subHeaderCell: {
+    padding: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: subHeaderHeight,
+    backgroundColor: Colors.lightBackground,
+  },
+  teamColumn: {
+    width: teamColumnWidth,
+  },
+  amountColumn: {
+    width: amountColumnWidth,
+  },
+  subHeaderText: {
+    color: Colors.textDark,
+    fontFamily: GlobalFonts.textMedium,
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  scrollableBody: {
+    // Empty style, just for structure
+  },
+  scrollableRow: {
+    flexDirection: 'row',
+  },
+  bodyCell: {
+    padding: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: rowHeight,
+    borderRightWidth: 1,
+    borderRightColor: Colors.borderLight,
+  },
+  evenRow: {
+    backgroundColor: Colors.white,
+  },
+  oddRow: {
+    backgroundColor: Colors.lightBackground,
+  },
+  levelText: {
+    fontFamily: GlobalFonts.textSemiBold,
+    color: Colors.textDark,
+    fontSize: 14,
+  },
+  bodyText: {
+    fontFamily: GlobalFonts.textMedium,
+    color: Colors.textDark,
+    fontSize: 14,
   },
 });
 

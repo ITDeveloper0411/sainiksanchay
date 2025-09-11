@@ -9,7 +9,6 @@ import {
   StatusBar,
   Image,
   TouchableOpacity,
-  ToastAndroid,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@react-native-vector-icons/ionicons';
@@ -21,6 +20,7 @@ import * as authActions from '../../store/actions/auth';
 import CustomTextInput from '../../components/CustomTextInput';
 import CustomButton from '../../components/CustomButton';
 import { useDispatch } from 'react-redux';
+import { ShowToast } from '../../components/ShowToast';
 
 export default function LoginScreen({ navigation }) {
   const dispatch = useDispatch();
@@ -30,10 +30,6 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState('9709970152');
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState({});
-
-  const showToast = message => {
-    ToastAndroid.show(message, ToastAndroid.SHORT);
-  };
 
   const validateSection = () => {
     const errors = {};
@@ -57,10 +53,10 @@ export default function LoginScreen({ navigation }) {
 
       if (result.success) {
       } else {
-        showToast(result.msg || 'Invalid Credentials.');
+        ShowToast(result.msg || 'Invalid Credentials.');
       }
     } catch (error) {
-      showToast(error.message);
+      ShowToast(error.message);
     } finally {
       setIsLoading(false);
     }

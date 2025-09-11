@@ -1,20 +1,12 @@
 // BottomNavigation.js (Fixed Icon Containment)
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  Dimensions,
-} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import {
   SafeAreaView,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
-import { GlobalFonts } from '../config/GlobalFonts';
 import { Colors } from '../config/Colors';
-
-const { width } = Dimensions.get('window');
+import { GlobalFonts } from '../config/GlobalFonts';
 
 const BottomNavigation = ({ navigation, state }) => {
   const insets = useSafeAreaInsets();
@@ -122,11 +114,11 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 11, // Slightly smaller font
-    fontWeight: '500',
+    fontFamily: GlobalFonts.textMedium,
   },
   activeLabel: {
     color: Colors.primaryDark,
-    fontWeight: '600',
+    fontFamily: GlobalFonts.textSemiBold,
   },
   inactiveLabel: {
     color: Colors.textGray,

@@ -1,7 +1,7 @@
 import { GET_REFERRAL_INCOME, GET_REFERRAL_LIST } from '../actions/referral';
 
 const initialState = {
-  referralList: 0,
+  referralList: [],
   totalMember: 0,
   totalPendingMember: 0,
   totalActiveMember: 0,

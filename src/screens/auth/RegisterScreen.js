@@ -12,7 +12,6 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
-  ToastAndroid,
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -34,6 +33,7 @@ import * as RNFS from 'react-native-fs';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useDispatch, useSelector } from 'react-redux';
 import * as authActions from '../../store/actions/auth';
+import { ShowToast } from '../../components/ShowToast';
 
 export default function RegisterScreen({ navigation }) {
   const dispatch = useDispatch();
@@ -94,7 +94,7 @@ export default function RegisterScreen({ navigation }) {
     try {
       dispatch(authActions.getDistrict(formData.state));
     } catch (error) {
-      showToast('Failed to fetch districts');
+      ShowToast('Failed to fetch districts');
     } finally {
       setIsLoadingDistricts(false);
     }
@@ -104,7 +104,7 @@ export default function RegisterScreen({ navigation }) {
     try {
       dispatch(authActions.getRegisterAmount());
     } catch (error) {
-      showToast('Failed to fetch registration amount');
+      ShowToast('Failed to fetch registration amount');
     }
   }, [dispatch]);
 
@@ -281,7 +281,7 @@ export default function RegisterScreen({ navigation }) {
 
     // Additional validation for amount
     if (parseFloat(formData.amountPaid) <= 0) {
-      showToast(
+      ShowToast(
         'Registration cannot be completed with zero amount. Please complete the payment.',
       );
       return;
@@ -289,7 +289,7 @@ export default function RegisterScreen({ navigation }) {
 
     // Additional validation for payment slip
     if (!formData.paymentSlip) {
-      showToast('Please upload payment slip before submitting');
+      ShowToast('Please upload payment slip before submitting');
       return;
     }
 
@@ -303,10 +303,10 @@ export default function RegisterScreen({ navigation }) {
           message: result.message || 'Registration submitted successfully!',
         });
       } else {
-        showToast(result.message || 'Registration failed. Please try again.');
+        ShowToast(result.message || 'Registration failed. Please try again.');
       }
     } catch (error) {
-      showToast(
+      ShowToast(
         'Registration failed: ' + (error.message || 'Please try again'),
       );
     } finally {
@@ -330,7 +330,7 @@ export default function RegisterScreen({ navigation }) {
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.errorCode) {
-        showToast('Failed to select image');
+        ShowToast('Failed to select image');
       } else if (response.assets && response.assets.length > 0) {
         const image = response.assets[0];
         setFormData(prev => ({
@@ -345,17 +345,13 @@ export default function RegisterScreen({ navigation }) {
         }));
       }
     } catch (err) {
-      showToast('Something went wrong while selecting image');
+      ShowToast('Something went wrong while selecting image');
     }
-  };
-
-  const showToast = message => {
-    ToastAndroid.show(message, ToastAndroid.SHORT);
   };
 
   const copyToClipboard = () => {
     Clipboard.setString(UPI);
-    showToast('UPI ID copied to clipboard');
+    ShowToast('UPI ID copied to clipboard');
   };
 
   const downloadQRCode = useCallback(async () => {
@@ -374,7 +370,7 @@ export default function RegisterScreen({ navigation }) {
         throw new Error(`Download failed with status: ${result.statusCode}`);
       }
 
-      showToast('QR Code downloaded successfully!');
+      ShowToast('QR Code downloaded successfully!');
     } finally {
       setIsDownload(false);
     }

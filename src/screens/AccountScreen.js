@@ -189,7 +189,7 @@ const AccountScreen = ({ navigation }) => {
     },
     {
       id: 4,
-      title: 'Referral List',
+      title: 'My Referral',
       icon: 'list-outline',
       onPress: () => navigation.navigate('ReferralList'),
       color: '#6BCB77',
@@ -462,7 +462,7 @@ const styles = StyleSheet.create({
   menuText: {
     flex: 1,
     fontSize: 15,
-    fontFamily: GlobalFonts.textMedium,
+    fontFamily: GlobalFonts.textSemiBold,
     color: Colors.textDark,
   },
   logoutButton: {

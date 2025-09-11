@@ -12,3 +12,5 @@ export const QR_CODE = require('../../assets/QR_CODE/qr_code.png');
 export const UPI = 'sainiksanchay8800001257@sbi';
 export const QR_CODE_URL =
   'https://www.sainiksanchay.org/public/assets/website/qr_code/1.png';
+
+export const ANDROID_PACKAGE_NAME = 'com.sainik.sanchay';
