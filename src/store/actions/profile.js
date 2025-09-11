@@ -33,7 +33,7 @@ export const getProfile = () => {
     if (result.status) {
       dispatch({
         type: GET_PROFILE,
-        data: result.data,
+        data: result.member,
       });
     } else {
       throw new Error(result.msg);
@@ -94,7 +94,7 @@ export const profileImageUpdate = image => {
         uri: image.uri,
       });
     }
-
+    6;
     const response = await fetch(`${BASE_URL}update_profile_image`, {
       method: 'POST',
       headers: {

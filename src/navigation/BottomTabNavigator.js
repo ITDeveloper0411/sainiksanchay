@@ -2,6 +2,7 @@ import React, { useState, createContext, useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import BottomNavigation from '../components/BottomNavigation';
 import HomeScreen from '../screens/HomeScreen';
+import AccountScreen from '../screens/AccountScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -28,6 +29,7 @@ const BottomTabNavigator = () => {
         screenOptions={{ headerShown: false }}
       >
         <Tab.Screen name="Home" component={HomeScreen} />
+        <Tab.Screen name="Account" component={AccountScreen} />
       </Tab.Navigator>
     </TabBarVisibilityContext.Provider>
   );

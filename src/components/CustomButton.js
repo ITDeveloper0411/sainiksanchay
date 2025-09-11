@@ -44,34 +44,71 @@ const CustomButton = ({
     }
   };
 
+  // Get appropriate colors for disabled state
+  const getDisabledColors = () => {
+    if (isPrimary) {
+      return {
+        backgroundColor: Colors.disabledPrimary,
+        borderColor: Colors.disabledPrimary,
+        textColor: Colors.white,
+        shadowColor: 'rgba(0, 0, 0, 0.1)',
+        loaderColor: Colors.white,
+        opacity: 1, // Primary buttons keep full opacity
+      };
+    } else {
+      return {
+        backgroundColor: 'rgba(255, 255, 255, 0.6)', // Semi-transparent white
+        borderColor: 'rgba(13, 43, 75, 0.4)', // Semi-transparent primary blue
+        textColor: 'rgba(13, 43, 75, 0.6)', // Semi-transparent primary blue text
+        shadowColor: 'rgba(0, 0, 0, 0.05)', // Very light shadow
+        loaderColor: 'rgba(13, 43, 75, 0.6)', // Semi-transparent primary blue loader
+        opacity: 1, // We'll handle opacity through colors instead
+      };
+    }
+  };
+
+  const disabledColors = isDisabled ? getDisabledColors() : null;
+
   return (
-    <TouchableOpacity
-      style={[styles.loginButton, { height: getButtonHeight() }]}
-      onPress={onPress}
-      disabled={isDisabled}
-      activeOpacity={isDisabled ? 1 : 0.7}
-    >
-      <View
+    <View style={[styles.buttonContainer, { height: getButtonHeight() + 4 }]}>
+      {/* Main button content */}
+      <TouchableOpacity
         style={[
           styles.buttonContent,
-          isPrimary ? styles.primaryButton : styles.secondaryButton,
-          isDisabled && styles.disabledButton,
+          isPrimary && !isDisabled && styles.primaryButton,
+          !isPrimary && !isDisabled && styles.secondaryButton,
+          isDisabled && {
+            backgroundColor: disabledColors.backgroundColor,
+            borderColor: disabledColors.borderColor,
+          },
           { height: getButtonHeight() },
         ]}
+        onPress={onPress}
+        disabled={isDisabled}
+        activeOpacity={isDisabled ? 1 : 0.7}
       >
         {loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator
               size="small"
-              color={isPrimary ? Colors.white : Colors.primaryBlue}
+              color={
+                isDisabled
+                  ? disabledColors.loaderColor
+                  : isPrimary
+                  ? Colors.white
+                  : Colors.primaryBlue
+              }
             />
             <Text
               style={[
                 styles.buttonText,
-                isPrimary
-                  ? styles.primaryButtonText
-                  : styles.secondaryButtonText,
-                isDisabled && styles.disabledText,
+                isPrimary && !isDisabled && styles.primaryButtonText,
+                !isPrimary && !isDisabled && styles.secondaryButtonText,
+                isDisabled && {
+                  color: disabledColors.textColor,
+                  // Add opacity only for secondary disabled buttons
+                  opacity: !isPrimary ? 0.7 : 1,
+                },
                 { fontSize: getFontSize(), marginLeft: 8 },
               ]}
               numberOfLines={1}
@@ -84,8 +121,13 @@ const CustomButton = ({
           <Text
             style={[
               styles.buttonText,
-              isPrimary ? styles.primaryButtonText : styles.secondaryButtonText,
-              isDisabled && styles.disabledText,
+              isPrimary && !isDisabled && styles.primaryButtonText,
+              !isPrimary && !isDisabled && styles.secondaryButtonText,
+              isDisabled && {
+                color: disabledColors.textColor,
+                // Add opacity only for secondary disabled buttons
+                opacity: !isPrimary ? 0.7 : 1,
+              },
               { fontSize: getFontSize() },
             ]}
             numberOfLines={1}
@@ -94,23 +136,30 @@ const CustomButton = ({
             {title}
           </Text>
         )}
-      </View>
+      </TouchableOpacity>
+
+      {/* Shadow element - positioned to right and bottom only */}
       <View
         style={[
           styles.buttonShadow,
-          isPrimary ? styles.primaryShadow : styles.secondaryShadow,
-          isDisabled && styles.disabledShadow,
+          isPrimary && !isDisabled && styles.primaryShadow,
+          !isPrimary && !isDisabled && styles.secondaryShadow,
+          isDisabled && {
+            backgroundColor: disabledColors.shadowColor,
+            // Reduce shadow opacity for disabled secondary buttons
+            opacity: !isPrimary ? 0.5 : 1,
+          },
         ]}
       />
-    </TouchableOpacity>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  loginButton: {
+  buttonContainer: {
     borderRadius: 12,
     position: 'relative',
-    minWidth: 100, // Ensure minimum width for buttons
+    minWidth: 100,
   },
   buttonContent: {
     borderRadius: 12,
@@ -118,9 +167,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 2,
-    position: 'relative',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 4,
+    bottom: 4,
     borderWidth: 1,
-    paddingHorizontal: 16, // Add horizontal padding
+    paddingHorizontal: 16,
   },
   loadingContainer: {
     flexDirection: 'row',
@@ -129,15 +182,11 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     backgroundColor: Colors.primaryBlue,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderColor: Colors.primaryBlue,
   },
   secondaryButton: {
     backgroundColor: Colors.white,
     borderColor: Colors.primaryBlue,
-  },
-  disabledButton: {
-    backgroundColor: Colors.textGray,
-    borderColor: Colors.borderLight,
   },
   buttonText: {
     letterSpacing: 0.5,
@@ -150,15 +199,12 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     color: Colors.primaryBlue,
   },
-  disabledText: {
-    color: Colors.textMediumGray,
-  },
   buttonShadow: {
     position: 'absolute',
     top: 4,
     left: 4,
-    right: -4,
-    bottom: -4,
+    right: 0,
+    bottom: 0,
     borderRadius: 12,
     zIndex: 1,
   },
@@ -167,9 +213,6 @@ const styles = StyleSheet.create({
   },
   secondaryShadow: {
     backgroundColor: 'rgba(13, 43, 75, 0.2)',
-  },
-  disabledShadow: {
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
   },
 });
 

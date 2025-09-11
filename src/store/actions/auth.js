@@ -45,7 +45,7 @@ export const login = (username, password) => {
 
     if (!response.ok) {
       if (response.status === 401) {
-        throw new Error('You have entered an incorrect password.');
+        throw new Error('Invalid credentials');
       } else {
         const resData = await response.json();
         throw new Error(resData.msg);
@@ -131,14 +131,11 @@ export const register = formData => {
 };
 
 export const getStates = () => {
-  return async (dispatch, getState) => {
-    const token = getState().auth.token;
-
+  return async dispatch => {
     const response = await fetch(`${BASE_URL}state`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -165,14 +162,11 @@ export const getStates = () => {
 };
 
 export const getDistrict = districtId => {
-  return async (dispatch, getState) => {
-    const token = getState().auth.token;
-
+  return async dispatch => {
     const response = await fetch(`${BASE_URL}district/${districtId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -199,14 +193,11 @@ export const getDistrict = districtId => {
 };
 
 export const getRegisterAmount = () => {
-  return async (dispatch, getState) => {
-    const token = getState().auth.token;
-
+  return async dispatch => {
     const response = await fetch(`${BASE_URL}registration-amount`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
     });
 

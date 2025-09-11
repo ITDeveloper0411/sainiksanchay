@@ -1,84 +1,143 @@
-// BottomNavigation.js
+// BottomNavigation.js (Fixed Icon Containment)
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Dimensions,
+} from 'react-native';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import { GlobalFonts } from '../config/GlobalFonts';
 import { Colors } from '../config/Colors';
+
+const { width } = Dimensions.get('window');
 
 const BottomNavigation = ({ navigation, state }) => {
   const insets = useSafeAreaInsets();
 
   const tabs = [
-    { label: 'Home', icon: '', screen: 'Home' },
-    { label: 'Explore', icon: '', screen: 'Explore' },
-    { label: 'Category', icon: '', screen: 'Category' },
-    { label: 'Cart', icon: '', screen: 'Cart' },
-    { label: 'Account', icon: '', screen: 'Account' },
+    {
+      label: 'Home',
+      emoji: '🏠',
+      screen: 'Home',
+    },
+    {
+      label: 'Account',
+      emoji: '👤',
+      screen: 'Account',
+    },
   ];
 
   return (
-    <View style={{ paddingBottom: insets.bottom }}>
-      <View style={styles.bottomNav}>
-        {tabs.map((tab, i) => {
-          const isFocused = state.index === i;
+    <SafeAreaView style={styles.safeArea} edges={['bottom']}>
+      <View
+        style={[
+          styles.container,
+          { paddingBottom: Math.max(insets.bottom, 0) },
+        ]}
+      >
+        <View style={styles.navBar}>
+          {tabs.map((tab, i) => {
+            const isFocused = state.index === i;
 
-          return (
-            <TouchableOpacity
-              key={i}
-              style={[styles.navItem, isFocused && styles.activeNavItem]}
-              onPress={() => navigation.navigate(tab.screen)}
-            >
-              <Text style={[styles.navIcon, isFocused && styles.activeIcon]}>
-                {tab.icon}
-              </Text>
-              <Text
-                style={[
-                  styles.navLabel,
-                  GlobalFonts.textMedium,
-                  isFocused && styles.activeLabel,
-                ]}
+            return (
+              <TouchableOpacity
+                key={i}
+                style={styles.navItem}
+                onPress={() => navigation.navigate(tab.screen)}
+                activeOpacity={0.8}
               >
-                {tab.label}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
+                <View style={styles.iconLabelContainer}>
+                  <View
+                    style={[
+                      styles.iconContainer,
+                      isFocused && styles.activeIconContainer,
+                    ]}
+                  >
+                    <Text style={styles.emojiIcon}>{tab.emoji}</Text>
+                  </View>
+                  <Text
+                    style={[
+                      styles.label,
+                      isFocused ? styles.activeLabel : styles.inactiveLabel,
+                    ]}
+                  >
+                    {tab.label}
+                  </Text>
+                </View>
+                {isFocused && <View style={styles.activeIndicator} />}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 10,
+  safeArea: {
+    backgroundColor: Colors.white,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     borderTopWidth: 1,
-    borderTopColor: Colors.textGray,
+    borderTopColor: Colors.borderLight,
+  },
+  container: {
+    paddingHorizontal: 0,
+  },
+  navBar: {
+    flexDirection: 'row',
+    height: 60,
     backgroundColor: Colors.white,
   },
   navItem: {
+    flex: 1,
     alignItems: 'center',
-    paddingBottom: 6,
+    justifyContent: 'center',
+    position: 'relative',
   },
-  activeNavItem: {
-    borderBottomWidth: 2,
-    borderBottomColor: Colors.primaryDark,
+  iconLabelContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  navIcon: {
-    fontSize: 18,
-    marginBottom: 2,
-    color: Colors.lightBlue,
+  iconContainer: {
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
   },
-  navLabel: {
-    fontSize: 12,
-    color: Colors.lightBlue,
+  activeIconContainer: {
+    // Add any active icon styling if needed
   },
-  activeIcon: {
-    color: Colors.primaryDark,
+  emojiIcon: {
+    fontSize: 18, // Slightly smaller to ensure it fits
+  },
+  label: {
+    fontSize: 11, // Slightly smaller font
+    fontWeight: '500',
   },
   activeLabel: {
     color: Colors.primaryDark,
+    fontWeight: '600',
+  },
+  inactiveLabel: {
+    color: Colors.textGray,
+  },
+  activeIndicator: {
+    position: 'absolute',
+    bottom: 4,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: Colors.primaryDark,
   },
 });
 

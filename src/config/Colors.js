@@ -49,6 +49,11 @@ export const Colors = {
   // Border colors
   borderLight: '#f1f5f9',
 
+  // Disabled state colors (ADDED THESE)
+  disabledPrimary: '#A0AEC0', // Muted blue for disabled primary buttons
+  disabledSecondary: '#E2E8F0', // Light gray for disabled secondary buttons
+  disabledText: '#718096', // Muted text color for disabled state
+
   // Transparent colors
   transparentBlue10: 'rgba(168, 208, 255, 0.1)',
   transparentBlue40: 'rgba(168, 208, 255, 0.4)',

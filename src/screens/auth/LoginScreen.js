@@ -26,8 +26,8 @@ export default function LoginScreen({ navigation }) {
   const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('SAM0002');
+  const [password, setPassword] = useState('9709970152');
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState({});
 
@@ -57,12 +57,10 @@ export default function LoginScreen({ navigation }) {
 
       if (result.success) {
       } else {
-        showToast(result.message || 'Registration failed. Please try again.');
+        showToast(result.msg || 'Invalid Credentials.');
       }
     } catch (error) {
-      showToast(
-        'Registration failed: ' + (error.message || 'Please try again'),
-      );
+      showToast(error.message);
     } finally {
       setIsLoading(false);
     }
