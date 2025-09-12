@@ -8,6 +8,7 @@ import NomineeScreen from '../screens/Profile/NomineeScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
 import * as profileActions from '../store/actions/profile';
 import { useDispatch } from 'react-redux';
+import KYCScreen from '../screens/Profile/KYCScreen';
 
 const Stack = createStackNavigator();
 
@@ -24,6 +25,7 @@ const StackNavigator = () => {
       <Stack.Screen name="ReferralIncome" component={ReferralIncomeScreen} />
       <Stack.Screen name="Nominee" component={NomineeScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name="KYC" component={KYCScreen} />
     </Stack.Navigator>
   );
 };

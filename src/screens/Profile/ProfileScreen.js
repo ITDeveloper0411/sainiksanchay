@@ -302,7 +302,9 @@ const ProfileScreen = ({ navigation }) => {
           iconName="call-outline"
           placeholder="Enter your mobile number"
           value={formData.mobile}
-          onChangeText={text => handleInputChange('mobile', text)}
+          onChangeText={text =>
+            handleInputChange('mobile', text.replace(/[^0-9]/g, ''))
+          }
           error={errors.mobile}
           keyboardType="phone-pad"
           maxLength={10}
@@ -372,7 +374,9 @@ const ProfileScreen = ({ navigation }) => {
           iconName="pin-outline"
           placeholder="Enter your pincode"
           value={formData.pincode}
-          onChangeText={text => handleInputChange('pincode', text)}
+          onChangeText={text =>
+            handleInputChange('pincode', text.replace(/[^0-9]/g, ''))
+          }
           error={errors.pincode}
           keyboardType="number-pad"
           maxLength={6}

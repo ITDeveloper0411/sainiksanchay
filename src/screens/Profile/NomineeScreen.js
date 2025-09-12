@@ -163,7 +163,9 @@ const NomineeScreen = ({ navigation }) => {
           iconName="call-outline"
           placeholder="Enter nominee's mobile number"
           value={formData.nominee_mobile}
-          onChangeText={text => handleInputChange('nominee_mobile', text)}
+          onChangeText={text =>
+            handleInputChange('nominee_mobile', text.replace(/[^0-9]/g, ''))
+          }
           error={errors.nominee_mobile}
           keyboardType="phone-pad"
           maxLength={10}
@@ -183,7 +185,7 @@ const NomineeScreen = ({ navigation }) => {
         />
 
         <CustomButton
-          title={updating ? 'Saving...' : 'Save Details'}
+          title={updating ? 'Updating...' : 'Update Nominee'}
           onPress={handleSubmit}
           variant="primary"
           loading={updating}

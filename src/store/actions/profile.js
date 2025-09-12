@@ -131,68 +131,19 @@ export const profileImageUpdate = formData => {
 };
 
 // Update the action creator (kycUpdate)
-export const kycUpdate = (
-  panImage,
-  panNumber,
-  aadhaarImage,
-  photo,
-  chequeImage,
-  dafDocument,
-  aadhaarNumber,
-) => {
+export const kycUpdate = formData => {
   return async (dispatch, getState) => {
     const token = getState().auth.token;
 
-    const fd = new FormData();
-
-    fd.append('pan_no', panNumber);
-    fd.append('aadhar_no', aadhaarNumber);
-
-    if (panImage.uri) {
-      fd.append('pan_img', {
-        type: panImage.type || 'image/jpeg',
-        name: panImage.fileName || 'pan_image.jpg',
-        uri: panImage.uri,
-      });
-    }
-    if (aadhaarImage.uri) {
-      fd.append('aadhar_img', {
-        type: aadhaarImage.type || 'image/jpeg',
-        name: aadhaarImage.fileName || 'aadhaar_image.jpg',
-        uri: aadhaarImage.uri,
-      });
-    }
-    if (photo.uri) {
-      fd.append('photo', {
-        type: photo.type || 'image/jpeg',
-        name: photo.fileName || 'photo.jpg',
-        uri: photo.uri,
-      });
-    }
-    if (chequeImage.uri) {
-      fd.append('cheque', {
-        type: chequeImage.type || 'image/jpeg',
-        name: chequeImage.fileName || 'cheque_image.jpg',
-        uri: chequeImage.uri,
-      });
-    }
-    if (dafDocument.uri) {
-      fd.append('daf', {
-        type: dafDocument.type === 'pdf' ? 'application/pdf' : 'image/jpeg',
-        name:
-          dafDocument.name ||
-          (dafDocument.type === 'pdf' ? 'daf_document.pdf' : 'daf_image.jpg'),
-        uri: dafDocument.uri,
-      });
-    }
-
     try {
-      const response = await fetch(`${BASE_URL}update_kyc_details`, {
+      const response = await fetch(`${BASE_URL}update-kyc`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
+          // Don't set Content-Type for FormData, browser will set it automatically
+          // with the correct boundary
         },
-        body: fd,
+        body: formData,
       });
 
       if (!response.ok) {
@@ -207,10 +158,10 @@ export const kycUpdate = (
       const result = await response.json();
 
       if (result.status) {
-        dispatch({
-          type: KYC_UPDATE,
-        });
-        return result; // Return the result for handling in the component
+        return {
+          success: true,
+          message: result.msg || 'KYC updated successfully',
+        };
       } else {
         throw new Error(result.msg || 'Failed to update KYC');
       }

@@ -28,6 +28,7 @@ export const Colors = {
   featureMint: '#D1FAE5',
 
   // Text colors
+  textLight: '#CFCFCF',
   textDark: '#2D3748',
   textGray: '#718096',
   textMediumGray: '#6B7280',
