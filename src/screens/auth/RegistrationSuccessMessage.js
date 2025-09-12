@@ -9,10 +9,10 @@ import {
   StatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors } from '../config/Colors';
-import { GlobalFonts } from '../config/GlobalFonts';
-import { LOGO } from '../config/Constant';
-import CustomButton from '../components/CustomButton';
+import { Colors } from '../../config/Colors';
+import { GlobalFonts } from '../../config/GlobalFonts';
+import { LOGO } from '../../config/Constant';
+import CustomButton from '../../components/CustomButton';
 import Ionicons from '@react-native-vector-icons/ionicons';
 
 const RegistrationSuccessMessage = ({ navigation, route }) => {

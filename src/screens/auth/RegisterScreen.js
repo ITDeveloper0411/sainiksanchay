@@ -46,6 +46,7 @@ export default function RegisterScreen({ navigation }) {
   const [formErrors, setFormErrors] = useState({});
   const [isDownload, setIsDownload] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingStates, setIsLoadingStates] = useState(false);
   const [isLoadingDistricts, setIsLoadingDistricts] = useState(false);
   const [isLoadingGuide, setIsLoadingGuide] = useState(false);
   const [samName, setSamName] = useState('');
@@ -89,6 +90,17 @@ export default function RegisterScreen({ navigation }) {
     }
   }, [registerAmount]);
 
+  const getStates = useCallback(() => {
+    setIsLoadingStates(true);
+    try {
+      dispatch(authActions.getStates());
+    } catch (error) {
+      ShowToast('Failed to fetch states');
+    } finally {
+      setIsLoadingStates(false);
+    }
+  }, [dispatch]);
+
   const getDistrict = useCallback(() => {
     setIsLoadingDistricts(true);
     try {
@@ -108,6 +120,10 @@ export default function RegisterScreen({ navigation }) {
     }
   }, [dispatch]);
 
+  useEffect(() => {
+    getStates();
+  }, [getStates]);
+
   // Fetch districts when state changes
   useEffect(() => {
     if (formData.state) {
@@ -118,7 +134,7 @@ export default function RegisterScreen({ navigation }) {
   // Fetch register amount when state changes
   useEffect(() => {
     getRegisterAmount();
-  }, [formData.state, getRegisterAmount]);
+  }, [getRegisterAmount]);
 
   // Function to fetch guide details directly
   const fetchGuideDetails = async samNo => {
@@ -513,6 +529,7 @@ export default function RegisterScreen({ navigation }) {
           value={formData.state}
           onSelect={item => handleInputChange('state', item.value)}
           error={formErrors.state}
+          loading={isLoadingStates}
         />
         {formErrors.state && (
           <Text style={styles.errorText}>{formErrors.state}</Text>

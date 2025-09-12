@@ -155,6 +155,7 @@ export const getStates = () => {
         type: GET_STATES,
         data: result.states,
       });
+      return Promise.resolve(result.states);
     } else {
       throw new Error(result.msg);
     }

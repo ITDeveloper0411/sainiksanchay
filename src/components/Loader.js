@@ -14,9 +14,7 @@ const Loader = () => {
         loop
         style={styles.loaderAnimation}
       />
-      <Text style={[styles.loaderText, GlobalFonts.textRegular]}>
-        Loading...
-      </Text>
+      <Text style={[styles.loaderText, GlobalFonts.textLight]}>Loading...</Text>
     </SafeAreaView>
   );
 };
@@ -34,7 +32,7 @@ const styles = StyleSheet.create({
   },
   loaderText: {
     fontSize: 16,
-    color: Colors.primaryColor,
+    color: Colors.primaryDark,
     fontFamily: GlobalFonts.textBold.fontFamily,
   },
 });

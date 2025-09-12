@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as dashboardActions from '../store/actions/dashboard';
 import Loader from '../components/Loader';
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }) {
   const { totalReferral, totalAmount } = useSelector(state => state.dashboard);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -80,7 +80,10 @@ export default function HomeScreen() {
         {/* Stats Cards */}
         <View style={styles.statsContainer}>
           {/* Total Referrals Card */}
-          <TouchableOpacity style={[styles.statCard, styles.referralCard]}>
+          <TouchableOpacity
+            style={[styles.statCard, styles.referralCard]}
+            onPress={() => navigation.navigate('ReferralList')}
+          >
             <View style={styles.statIconContainer}>
               <Ionicons
                 name="people-outline"
@@ -103,7 +106,10 @@ export default function HomeScreen() {
           </TouchableOpacity>
 
           {/* Total Income Card */}
-          <TouchableOpacity style={[styles.statCard, styles.incomeCard]}>
+          <TouchableOpacity
+            style={[styles.statCard, styles.incomeCard]}
+            onPress={() => navigation.navigate('ReferralIncome')}
+          >
             <View style={styles.statIconContainer}>
               <Ionicons
                 name="wallet-outline"

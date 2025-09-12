@@ -52,7 +52,9 @@ const SearchableDropdown = ({
     }
   };
 
-  const selectedItem = data.find(item => item.value === value);
+  const selectedItem = data.find(item => {
+    return item.value?.toString() === value?.toString();
+  });
 
   const renderEmptyList = () => {
     if (loading) {

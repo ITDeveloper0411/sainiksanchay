@@ -1,9 +1,7 @@
 import {
   GET_PROFILE,
   UPDATE_PROFILE,
-  UPDATE_PROFILE_IMAGE,
   KYC_UPDATE,
-  BANK_DETAILS_UPDATE,
   CHANGE_PASSWORD,
 } from '../actions/profile';
 
@@ -26,19 +24,7 @@ export default (state = initialState, action) => {
       };
     }
 
-    case UPDATE_PROFILE_IMAGE: {
-      return {
-        ...state,
-      };
-    }
-
     case KYC_UPDATE: {
-      return {
-        ...state,
-      };
-    }
-
-    case BANK_DETAILS_UPDATE: {
       return {
         ...state,
       };

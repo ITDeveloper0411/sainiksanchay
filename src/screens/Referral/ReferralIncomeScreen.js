@@ -1,14 +1,14 @@
 // screens/ReferralIncomeScreen.js
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
-import { GlobalFonts } from '../config/GlobalFonts';
+import { GlobalFonts } from '../../config/GlobalFonts';
 import { useDispatch, useSelector } from 'react-redux';
-import * as referralActions from '../store/actions/referral';
-import { ShowToast } from '../components/ShowToast';
-import Loader from '../components/Loader';
-import { Colors } from '../config/Colors';
-import BackHeader from '../components/BackHeader';
-import MonthYearPicker from '../components/MonthYearPicker';
+import * as referralActions from '../../store/actions/referral';
+import { ShowToast } from '../../components/ShowToast';
+import Loader from '../../components/Loader';
+import { Colors } from '../../config/Colors';
+import BackHeader from '../../components/BackHeader';
+import MonthYearPicker from '../../components/MonthYearPicker';
 
 const ReferralIncomeScreen = ({ navigation }) => {
   const dispatch = useDispatch();

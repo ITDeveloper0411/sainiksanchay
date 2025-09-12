@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     fontFamily: GlobalFonts.textMedium,
   },
   disabledInput: {
-    backgroundColor: Colors.lightBackground,
+    // backgroundColor: Colors.lightBackground,
     color: Colors.textMediumGray,
   },
   inputIcon: {

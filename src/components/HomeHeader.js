@@ -47,7 +47,9 @@ const HomeHeader = () => {
           <Text style={styles.userName} numberOfLines={1} ellipsizeMode="tail">
             {profile?.name || 'User Name'}
           </Text>
-          <Text style={styles.userId}>ID: {profile?.username || 'N/A'}</Text>
+          <Text style={styles.userId}>
+            SAM ID : {profile?.username || 'N/A'}
+          </Text>
         </View>
       </View>
       <View style={styles.incomeContainer}>

@@ -3,11 +3,11 @@ import {
   combineReducers,
   applyMiddleware,
 } from 'redux';
-import { thunk } from 'redux-thunk';
 import authReducer from './reducers/auth';
 import profileReducer from './reducers/profile';
 import dashboardReducer from './reducers/dashboard';
 import referralReducer from './reducers/referral';
+import { thunk } from 'redux-thunk';
 
 const rootReducer = combineReducers({
   auth: authReducer,

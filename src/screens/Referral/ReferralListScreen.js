@@ -10,15 +10,15 @@ import {
   RefreshControl,
   Dimensions,
 } from 'react-native';
-import { GlobalFonts } from '../config/GlobalFonts';
-import { Colors } from '../config/Colors';
-import * as referralActions from '../store/actions/referral';
+import { GlobalFonts } from '../../config/GlobalFonts';
+import { Colors } from '../../config/Colors';
+import * as referralActions from '../../store/actions/referral';
 import { useDispatch, useSelector } from 'react-redux';
-import { ShowToast } from '../components/ShowToast';
+import { ShowToast } from '../../components/ShowToast';
 import Icon from '@react-native-vector-icons/material-icons';
-import BackHeader from '../components/BackHeader';
-import { ANDROID_PACKAGE_NAME } from '../config/Constant';
-import Loader from '../components/Loader';
+import BackHeader from '../../components/BackHeader';
+import { ANDROID_PACKAGE_NAME } from '../../config/Constant';
+import Loader from '../../components/Loader';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
