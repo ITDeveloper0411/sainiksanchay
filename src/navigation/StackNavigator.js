@@ -9,6 +9,8 @@ import ProfileScreen from '../screens/Profile/ProfileScreen';
 import * as profileActions from '../store/actions/profile';
 import { useDispatch } from 'react-redux';
 import KYCScreen from '../screens/Profile/KYCScreen';
+import ChangePasswordScreen from '../screens/Profile/ChangePasswordScreen';
+import ContactScreen from '../screens/ContactScreen';
 
 const Stack = createStackNavigator();
 
@@ -26,6 +28,8 @@ const StackNavigator = () => {
       <Stack.Screen name="Nominee" component={NomineeScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="KYC" component={KYCScreen} />
+      <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
+      <Stack.Screen name="Contact" component={ContactScreen} />
     </Stack.Navigator>
   );
 };

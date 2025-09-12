@@ -3,10 +3,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import AuthNavigator from './AuthNavigator';
 import StackNavigator from './StackNavigator';
 import { useDispatch, useSelector } from 'react-redux';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loader from '../components/Loader';
-import { AUTH_TOKEN } from '../config/Constant';
 import * as authActions from '../store/actions/auth';
+import { getToken } from '../utils/tokenManager';
 
 const MainNavigator = () => {
   const { token } = useSelector(state => state.auth);
@@ -19,7 +18,7 @@ const MainNavigator = () => {
 
     (async () => {
       try {
-        const accessToken = await AsyncStorage.getItem(AUTH_TOKEN);
+        const accessToken = await getToken();
 
         if (accessToken) {
           // First set the token in Redux store

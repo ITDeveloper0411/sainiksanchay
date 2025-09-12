@@ -1,9 +1,6 @@
 import { BASE_URL } from '../../config/Constant';
 
 export const GET_PROFILE = 'GET_PROFILE';
-export const UPDATE_PROFILE = 'UPDATE_PROFILE';
-export const KYC_UPDATE = 'KYC_UPDATE';
-export const CHANGE_PASSWORD = 'CHANGE_PASSWORD';
 
 export const getProfile = () => {
   return async (dispatch, getState) => {
@@ -214,19 +211,24 @@ export const nomineeDetailsUpdate = nomineeData => {
   };
 };
 
-export const changePassword = (currentPassword, newPassword) => {
+export const changePassword = ({
+  old_password,
+  new_password,
+  new_password_confirmation,
+}) => {
   return async (dispatch, getState) => {
     const token = getState().auth.token;
 
-    const response = await fetch(`${BASE_URL}change_password`, {
+    const response = await fetch(`${BASE_URL}change-password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        old_password: currentPassword,
-        new_password: newPassword,
+        old_password,
+        new_password,
+        new_password_confirmation,
       }),
     });
 
@@ -242,9 +244,10 @@ export const changePassword = (currentPassword, newPassword) => {
     const result = await response.json();
 
     if (result.status) {
-      dispatch({
-        type: CHANGE_PASSWORD,
-      });
+      return {
+        success: true,
+        message: result.msg || 'Password changed successfully',
+      };
     } else {
       throw new Error(result.msg);
     }

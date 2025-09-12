@@ -1,5 +1,5 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AUTH_TOKEN, BASE_URL } from '../../config/Constant';
+import { BASE_URL } from '../../config/Constant';
+import { removeToken, storeToken } from '../../utils/tokenManager';
 
 export const AUTHENTICATE = 'AUTHENTICATE';
 export const REGISTER = 'REGISTER';
@@ -8,19 +8,36 @@ export const GET_STATES = 'GET_STATES';
 export const GET_DISTRICTS = 'GET_DISTRICTS';
 export const GET_REGISTER_AMOUNT = 'GET_REGISTER_AMOUNT';
 
-const _storeToken = async token => {
-  try {
-    await AsyncStorage.setItem(AUTH_TOKEN, token);
-  } catch (error) {
-    throw new Error(error.message);
-  }
-};
-
 export const logout = () => {
   return async dispatch => {
-    dispatch({
-      type: LOGOUT,
-    });
+    try {
+      const response = await fetch(`${BASE_URL}logout`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      // Even if API call fails, ensure we logout locally
+      if (!response.ok) {
+        console.log('Logout API failed, but proceeding with local logout');
+      }
+
+      // Remove token from storage
+      await removeToken();
+
+      // Dispatch logout action
+      dispatch({
+        type: LOGOUT,
+      });
+    } catch (error) {
+      // Ensure we logout even if there's an error
+      await removeToken();
+      dispatch({
+        type: LOGOUT,
+      });
+      throw error;
+    }
   };
 };
 
@@ -60,7 +77,7 @@ export const login = (username, password) => {
         token: resData.token,
       });
 
-      await _storeToken(resData.token);
+      await storeToken(resData.token);
       return {
         success: true,
         message: resData.msg || 'Login successful',

@@ -62,7 +62,7 @@ export default function HomeScreen({ navigation }) {
       />
 
       {/* Header Section */}
-      <HomeHeader />
+      <HomeHeader navigation={navigation} />
 
       {/* Main Content */}
       <ScrollView

@@ -464,7 +464,10 @@ const AccountScreen = ({ navigation }) => {
         {/* Support Section */}
         <View style={styles.supportContainer}>
           <Text style={styles.sectionTitle}>Support</Text>
-          <View style={styles.supportCard}>
+          <TouchableOpacity
+            style={styles.supportCard}
+            onPress={() => navigation.navigate('Contact')}
+          >
             <View style={styles.supportIcon}>
               <Ionicons name="help-buoy-outline" size={24} color="#6366F1" />
             </View>
@@ -474,14 +477,7 @@ const AccountScreen = ({ navigation }) => {
                 Contact our support team for assistance
               </Text>
             </View>
-            <TouchableOpacity style={styles.supportButton}>
-              <Ionicons
-                name="chatbox-ellipses-outline"
-                size={20}
-                color="#6366F1"
-              />
-            </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
         </View>
 
         {/* Logout Button */}

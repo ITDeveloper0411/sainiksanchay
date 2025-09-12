@@ -1,12 +1,19 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ActivityIndicator,
+  TouchableOpacity,
+} from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { GlobalFonts } from '../config/GlobalFonts';
 import { Colors } from '../config/Colors';
 import { useSelector } from 'react-redux';
 import { LOGO } from '../config/Constant'; // Assuming you have a default logo
 
-const HomeHeader = () => {
+const HomeHeader = ({ navigation }) => {
   const { profile } = useSelector(state => state.profile);
   const [imageLoading, setImageLoading] = React.useState(true);
   const [imageError, setImageError] = React.useState(false);
@@ -23,7 +30,10 @@ const HomeHeader = () => {
   return (
     <View style={styles.header}>
       <View style={styles.profileContainer}>
-        <View style={styles.imageContainer}>
+        <TouchableOpacity
+          style={styles.imageContainer}
+          onPress={() => navigation.navigate('Profile')}
+        >
           {imageLoading && (
             <ActivityIndicator
               style={styles.loader}
@@ -42,7 +52,7 @@ const HomeHeader = () => {
             onLoad={handleImageLoad}
             resizeMode="cover"
           />
-        </View>
+        </TouchableOpacity>
         <View style={styles.userInfo}>
           <Text style={styles.userName} numberOfLines={1} ellipsizeMode="tail">
             {profile?.name || 'User Name'}

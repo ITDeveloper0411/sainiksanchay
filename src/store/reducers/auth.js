@@ -56,7 +56,6 @@ export default (state = initialState, action) => {
     }
 
     case LOGOUT:
-      AsyncStorage.removeItem(AUTH_TOKEN);
       ShowToast('Logout Successfully !');
       return { ...initialState };
     default:
