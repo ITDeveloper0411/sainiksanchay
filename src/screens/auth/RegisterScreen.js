@@ -18,7 +18,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { GlobalFonts } from '../../config/GlobalFonts';
 import CustomButton from '../../components/CustomButton';
-import CustomTextInput from '../../components/CustomTextInput'; // Updated import
+import CustomTextInput from '../../components/CustomTextInput';
 import { Colors } from '../../config/Colors';
 import SearchableDropdown from '../../components/SearchableDropdown';
 import Ionicons from '@react-native-vector-icons/ionicons';
@@ -719,46 +719,57 @@ export default function RegisterScreen({ navigation }) {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+    <View style={styles.container}>
       <StatusBar
         backgroundColor={Colors.primaryBlue}
         barStyle="light-content"
+        translucent={Platform.OS === 'android' && Platform.Version >= 21}
       />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardAvoid}
-      >
-        <ScrollView
-          contentContainerStyle={styles.scrollContainer}
-          showsVerticalScrollIndicator={false}
+      <SafeAreaView style={styles.safeArea} edges={['left', 'right', 'bottom']}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardAvoid}
         >
-          <View style={styles.header}>
-            <View style={styles.logoContainer}>
-              <Image
-                source={LOGO}
-                style={styles.logoImage}
-                resizeMode="contain"
-              />
+          <ScrollView
+            contentContainerStyle={styles.scrollContainer}
+            showsVerticalScrollIndicator={false}
+          >
+            <View
+              style={[
+                styles.header,
+                Platform.OS === 'android' &&
+                  Platform.Version >= 21 && {
+                    paddingTop: StatusBar.currentHeight,
+                  },
+              ]}
+            >
+              <View style={styles.logoContainer}>
+                <Image
+                  source={LOGO}
+                  style={styles.logoImage}
+                  resizeMode="contain"
+                />
+              </View>
+              <Text style={styles.title}>Sainik Sanchay</Text>
+              <Text style={styles.subtitle}>Member Registration</Text>
             </View>
-            <Text style={styles.title}>Sainik Sanchay</Text>
-            <Text style={styles.subtitle}>Member Registration</Text>
-          </View>
 
-          <View style={styles.formContainer}>
-            {currentSection === 'A' && renderSectionA()}
-            {currentSection === 'B' && renderSectionB()}
-            {currentSection === 'C' && renderSectionC()}
-          </View>
+            <View style={styles.formContainer}>
+              {currentSection === 'A' && renderSectionA()}
+              {currentSection === 'B' && renderSectionB()}
+              {currentSection === 'C' && renderSectionC()}
+            </View>
 
-          <View style={styles.loginRedirect}>
-            <Text style={styles.loginText}>Already have an account? </Text>
-            <TouchableOpacity onPress={handleLoginRedirect}>
-              <Text style={styles.loginLink}>Login here</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+            <View style={styles.loginRedirect}>
+              <Text style={styles.loginText}>Already have an account? </Text>
+              <TouchableOpacity onPress={handleLoginRedirect}>
+                <Text style={styles.loginLink}>Login here</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </View>
   );
 }
 
@@ -766,6 +777,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.lightBackground,
+  },
+  safeArea: {
+    flex: 1,
   },
   keyboardAvoid: {
     flex: 1,

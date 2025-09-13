@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
+  Platform,
 } from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { GlobalFonts } from '../config/GlobalFonts';
@@ -26,10 +27,11 @@ const ContactScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['right', 'left']}>
       <StatusBar
         backgroundColor={Colors.primaryBlue}
         barStyle="light-content"
+        translucent={Platform.OS === 'android'}
       />
 
       {/* Header with Back Button */}
@@ -47,6 +49,7 @@ const ContactScreen = ({ navigation }) => {
       <ScrollView
         style={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
       >
         {/* Header Section */}
         <View style={styles.header}>
@@ -111,20 +114,28 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flex: 1,
   },
+  scrollContent: {
+    paddingBottom: 20,
+  },
   topHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: Colors.primaryBlue,
     paddingVertical: 16,
     paddingHorizontal: 20,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 16 : 16,
   },
   topHeaderTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontFamily: GlobalFonts.textSemiBold,
     color: Colors.white,
+    flex: 1,
   },
   backButton: {
     padding: 4,
+    marginRight: 8,
+    borderRadius: 20,
   },
   backButtonPlaceholder: {
     width: 32,
@@ -136,15 +147,6 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
     alignItems: 'center',
-  },
-  headerIcon: {
-    backgroundColor: Colors.transparentBlue15,
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
   },
   headerTitle: {
     fontSize: 32,
@@ -208,91 +210,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: GlobalFonts.textLight,
     color: '#666',
-  },
-  socialSection: {
-    padding: 20,
-    backgroundColor: Colors.white,
-    margin: 20,
-    borderRadius: 20,
-    shadowColor: Colors.shadow,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  sectionTitle: {
-    fontSize: 22,
-    fontFamily: GlobalFonts.textBold,
-    color: Colors.textDark,
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  sectionSubtitle: {
-    fontSize: 14,
-    fontFamily: GlobalFonts.textLight,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  socialContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 16,
-  },
-  socialButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: Colors.shadow,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  faqSection: {
-    padding: 20,
-  },
-  faqItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.white,
-    padding: 20,
-    borderRadius: 15,
-    marginBottom: 12,
-    shadowColor: Colors.shadow,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  faqText: {
-    flex: 1,
-    fontSize: 16,
-    fontFamily: GlobalFonts.textMedium,
-    color: Colors.textDark,
-    marginLeft: 12,
-  },
-  bottomGraphic: {
-    alignItems: 'center',
-    padding: 40,
-    opacity: 0.7,
-  },
-  bottomText: {
-    fontSize: 16,
-    fontFamily: GlobalFonts.textMedium,
-    color: '#666',
-    marginTop: 12,
   },
 });
 

@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   StatusBar,
   RefreshControl,
+  Platform,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@react-native-vector-icons/ionicons';
@@ -24,6 +26,9 @@ export default function HomeScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
   const { showTabBar } = useTabBarVisibility();
+
+  // Get screen height for responsive bottom padding
+  const screenHeight = Dimensions.get('window').height;
 
   useEffect(() => {
     showTabBar();
@@ -55,84 +60,92 @@ export default function HomeScreen({ navigation }) {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+    <View style={styles.container}>
       <StatusBar
         backgroundColor={Colors.primaryBlue}
         barStyle="light-content"
+        translucent={Platform.OS === 'android' && Platform.Version >= 21}
       />
 
-      {/* Header Section */}
-      <HomeHeader navigation={navigation} />
+      {/* SafeAreaView for top and bottom with custom padding */}
+      <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
+        {/* Header Section */}
+        <HomeHeader navigation={navigation} />
 
-      {/* Main Content */}
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={[Colors.primaryBlue]}
-            tintColor={Colors.primaryBlue}
-          />
-        }
-      >
-        {/* Stats Cards */}
-        <View style={styles.statsContainer}>
-          {/* Total Referrals Card */}
-          <TouchableOpacity
-            style={[styles.statCard, styles.referralCard]}
-            onPress={() => navigation.navigate('ReferralList')}
-          >
-            <View style={styles.statIconContainer}>
-              <Ionicons
-                name="people-outline"
-                size={28}
-                color={Colors.primaryBlue}
-              />
-            </View>
-            <View style={styles.statContent}>
-              <Text style={styles.statLabel}>Total Referrals</Text>
-              <Text style={styles.statValue}>
-                {totalReferral !== undefined ? totalReferral : '0'}
-              </Text>
-              <Text style={styles.statSubtext}>Active Members</Text>
-            </View>
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color={Colors.textMediumGray}
+        {/* Main Content */}
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={[
+            styles.scrollContainer,
+            { paddingBottom: screenHeight * 0.12 }, // Responsive bottom padding
+          ]}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[Colors.primaryBlue]}
+              tintColor={Colors.primaryBlue}
             />
-          </TouchableOpacity>
+          }
+        >
+          {/* Stats Cards */}
+          <View style={styles.statsContainer}>
+            {/* Total Referrals Card */}
+            <TouchableOpacity
+              style={[styles.statCard, styles.referralCard]}
+              onPress={() => navigation.navigate('ReferralList')}
+            >
+              <View style={styles.statIconContainer}>
+                <Ionicons
+                  name="people-outline"
+                  size={28}
+                  color={Colors.primaryBlue}
+                />
+              </View>
+              <View style={styles.statContent}>
+                <Text style={styles.statLabel}>Total Referrals</Text>
+                <Text style={styles.statValue}>
+                  {totalReferral !== undefined ? totalReferral : '0'}
+                </Text>
+                <Text style={styles.statSubtext}>Active Members</Text>
+              </View>
+              <Ionicons
+                name="chevron-forward"
+                size={20}
+                color={Colors.textMediumGray}
+              />
+            </TouchableOpacity>
 
-          {/* Total Income Card */}
-          <TouchableOpacity
-            style={[styles.statCard, styles.incomeCard]}
-            onPress={() => navigation.navigate('ReferralIncome')}
-          >
-            <View style={styles.statIconContainer}>
+            {/* Total Income Card */}
+            <TouchableOpacity
+              style={[styles.statCard, styles.incomeCard]}
+              onPress={() => navigation.navigate('ReferralIncome')}
+            >
+              <View style={styles.statIconContainer}>
+                <Ionicons
+                  name="wallet-outline"
+                  size={28}
+                  color={Colors.success}
+                />
+              </View>
+              <View style={styles.statContent}>
+                <Text style={styles.statLabel}>Total Income</Text>
+                <Text style={styles.statValue}>
+                  {totalAmount !== undefined ? `₹${totalAmount}` : '₹0'}
+                </Text>
+                <Text style={styles.statSubtext}>Lifetime Earnings</Text>
+              </View>
               <Ionicons
-                name="wallet-outline"
-                size={28}
-                color={Colors.success}
+                name="chevron-forward"
+                size={20}
+                color={Colors.textMediumGray}
               />
-            </View>
-            <View style={styles.statContent}>
-              <Text style={styles.statLabel}>Total Income</Text>
-              <Text style={styles.statValue}>
-                {totalAmount !== undefined ? `₹${totalAmount}` : '₹0'}
-              </Text>
-              <Text style={styles.statSubtext}>Lifetime Earnings</Text>
-            </View>
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color={Colors.textMediumGray}
-            />
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </View>
   );
 }
 
@@ -141,10 +154,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.lightBackground,
   },
+  safeArea: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
   scrollContainer: {
     flexGrow: 1,
     paddingHorizontal: 16,
-    paddingVertical: 20,
+    paddingTop: 20,
   },
   statsContainer: {
     flex: 1,

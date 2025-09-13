@@ -26,9 +26,9 @@ import * as profileActions from '../../store/actions/profile';
 import { LOGO } from '../../config/Constant';
 import { ShowToast } from '../../components/ShowToast';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
-const AccountScreen = ({ navigation }) => {
+const SettingsScreen = ({ navigation }) => {
   const { profile } = useSelector(state => state.profile);
   const dispatch = useDispatch();
   const [image, setImage] = useState(profile?.profile_img || null);
@@ -270,32 +270,32 @@ const AccountScreen = ({ navigation }) => {
     switch (status) {
       case 'VERIFIED':
         icon = 'checkmark-circle';
-        color = '#10B981';
-        bgColor = '#ECFDF5';
+        color = Colors.success;
+        bgColor = Colors.featureTeal;
         message = 'Your KYC has been successfully verified';
         break;
       case 'NOT VERIFIED':
         icon = 'alert-circle';
-        color = '#6B7280';
-        bgColor = '#F3F4F6';
+        color = Colors.textMediumGray;
+        bgColor = Colors.lightBackground;
         message = 'Please complete your KYC verification';
         break;
       case 'SEND FOR APPROVAL':
         icon = 'time';
-        color = '#F59E0B';
-        bgColor = '#FFFBEB';
+        color = Colors.warning;
+        bgColor = Colors.featureYellow;
         message = 'Your KYC is under review';
         break;
       case 'REJECTED':
         icon = 'close-circle';
-        color = '#EF4444';
-        bgColor = '#FEF2F2';
+        color = Colors.error;
+        bgColor = Colors.featureRed;
         message = profile?.kyc_rejection || 'Your KYC has been rejected';
         break;
       default:
         icon = 'alert-circle';
-        color = '#6B7280';
-        bgColor = '#F3F4F6';
+        color = Colors.textMediumGray;
+        bgColor = Colors.lightBackground;
         message = 'KYC status unknown';
     }
 
@@ -333,7 +333,7 @@ const AccountScreen = ({ navigation }) => {
       title: 'My Referral',
       icon: 'gift-outline',
       onPress: () => navigation.navigate('ReferralList'),
-      color: '#10B981',
+      color: Colors.success,
     },
     {
       id: 5,
@@ -352,219 +352,248 @@ const AccountScreen = ({ navigation }) => {
   ];
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-      <StatusBar backgroundColor="#FFFFFF" barStyle="dark-content" />
+    <View style={styles.fullContainer}>
+      <StatusBar
+        backgroundColor={Colors.primaryBlue}
+        barStyle="light-content"
+        translucent={Platform.OS === 'android'}
+      />
 
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Profile Header Section */}
-        <View style={styles.profileHeader}>
-          <View style={styles.profileCard}>
-            <View style={styles.imageContainer}>
-              {uploading ? (
-                <View style={styles.imageLoading}>
-                  <ActivityIndicator size="large" color={Colors.primaryBlue} />
-                </View>
-              ) : (
-                <Image
-                  source={image ? { uri: image } : LOGO}
-                  style={styles.profileImage}
-                  onError={() => setImage(null)}
-                />
-              )}
-              <TouchableOpacity
-                style={styles.editImageButton}
-                onPress={() => setModalVisible(true)}
-                disabled={uploading}
-              >
-                <Ionicons name="camera" size={16} color={Colors.white} />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.userInfo}>
-              <Text style={styles.userName} numberOfLines={1}>
-                {profile?.name || 'User Name'}
-              </Text>
-              <Text style={styles.userId}>
-                SAM ID: {profile?.username || 'N/A'}
-              </Text>
-              <Text style={styles.userPhone}>{profile?.mobile || 'N/A'}</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* KYC Status Banner */}
-        {profile?.kyc_status && (
-          <View
-            style={[styles.kycBanner, { backgroundColor: kycStatus.bgColor }]}
-          >
-            <View style={styles.kycBannerContent}>
-              <Ionicons
-                name={kycStatus.icon}
-                size={24}
-                color={kycStatus.color}
-                style={styles.kycIcon}
-              />
-              <View style={styles.kycTextContainer}>
-                <Text
-                  style={[styles.kycStatusText, { color: kycStatus.color }]}
-                >
-                  KYC {kycStatus.status}
-                </Text>
-                <Text style={styles.kycMessageText}>{kycStatus.message}</Text>
-              </View>
-            </View>
-            {profile?.kyc_status === 'REJECTED' && (
-              <TouchableOpacity
-                style={styles.kycActionButton}
-                onPress={() => navigation.navigate('KYC')}
-              >
-                <Text
-                  style={[styles.kycActionText, { color: kycStatus.color }]}
-                >
-                  Resubmit
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        )}
-
-        {/* Menu Items */}
-        <View style={styles.menuContainer}>
-          <Text style={styles.sectionTitle}>Account Settings</Text>
-          {menuItems.map(item => (
-            <TouchableOpacity
-              key={item.id}
-              style={styles.menuItem}
-              onPress={item.onPress}
-              activeOpacity={0.7}
-            >
-              <View style={[styles.menuIcon, { backgroundColor: item.color }]}>
-                <Ionicons name={item.icon} size={20} color={Colors.white} />
-              </View>
-              <Text style={styles.menuText}>{item.title}</Text>
-              {item.status ? (
-                <View
-                  style={[
-                    styles.statusBadge,
-                    { backgroundColor: item.statusColor },
-                  ]}
-                >
-                  <Text style={styles.statusText}>{item.status}</Text>
-                </View>
-              ) : (
-                <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
-              )}
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Support Section */}
-        <View style={styles.supportContainer}>
-          <Text style={styles.sectionTitle}>Support</Text>
-          <TouchableOpacity
-            style={styles.supportCard}
-            onPress={() => navigation.navigate('Contact')}
-          >
-            <View style={styles.supportIcon}>
-              <Ionicons name="help-buoy-outline" size={24} color="#6366F1" />
-            </View>
-            <View style={styles.supportContent}>
-              <Text style={styles.supportTitle}>Need Help?</Text>
-              <Text style={styles.supportSubtitle}>
-                Contact our support team for assistance
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        {/* Logout Button */}
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={handleLogout}
-          activeOpacity={0.7}
+      {/* SafeAreaView with proper edges for iOS and Android */}
+      <SafeAreaView style={styles.container} edges={['left', 'right']}>
+        <ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContentContainer}
         >
-          <Ionicons name="log-out-outline" size={20} color="#EF4444" />
-          <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
-      </ScrollView>
-
-      {/* Image Picker Modal */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Update Profile Photo</Text>
-
-            <TouchableOpacity
-              style={styles.modalOption}
-              onPress={takePhoto}
-              activeOpacity={0.7}
-            >
-              <View style={styles.modalIcon}>
-                <Ionicons name="camera" size={24} color="#6366F1" />
+          {/* Profile Header Section */}
+          <View style={styles.profileHeader}>
+            <View style={styles.profileCard}>
+              <View style={styles.imageContainer}>
+                {uploading ? (
+                  <View style={styles.imageLoading}>
+                    <ActivityIndicator
+                      size="large"
+                      color={Colors.primaryBlue}
+                    />
+                  </View>
+                ) : (
+                  <Image
+                    source={image ? { uri: image } : LOGO}
+                    style={styles.profileImage}
+                    onError={() => setImage(null)}
+                  />
+                )}
+                <TouchableOpacity
+                  style={styles.editImageButton}
+                  onPress={() => setModalVisible(true)}
+                  disabled={uploading}
+                >
+                  <Ionicons name="camera" size={16} color={Colors.white} />
+                </TouchableOpacity>
               </View>
-              <View style={styles.modalTextContainer}>
-                <Text style={styles.modalOptionText}>Take Photo</Text>
-                <Text style={styles.modalOptionSubtext}>
-                  Use your camera to take a new photo
+
+              <View style={styles.userInfo}>
+                <Text style={styles.userName} numberOfLines={1}>
+                  {profile?.name || 'User Name'}
+                </Text>
+                <Text style={styles.userId}>
+                  SAM ID: {profile?.username || 'N/A'}
+                </Text>
+                <Text style={styles.userPhone}>{profile?.mobile || 'N/A'}</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* KYC Status Banner */}
+          {profile?.kyc_status && (
+            <View
+              style={[styles.kycBanner, { backgroundColor: kycStatus.bgColor }]}
+            >
+              <View style={styles.kycBannerContent}>
+                <Ionicons
+                  name={kycStatus.icon}
+                  size={24}
+                  color={kycStatus.color}
+                  style={styles.kycIcon}
+                />
+                <View style={styles.kycTextContainer}>
+                  <Text
+                    style={[styles.kycStatusText, { color: kycStatus.color }]}
+                  >
+                    KYC {kycStatus.status}
+                  </Text>
+                  <Text style={styles.kycMessageText}>{kycStatus.message}</Text>
+                </View>
+              </View>
+              {profile?.kyc_status === 'REJECTED' && (
+                <TouchableOpacity
+                  style={styles.kycActionButton}
+                  onPress={() => navigation.navigate('KYC')}
+                >
+                  <Text
+                    style={[styles.kycActionText, { color: kycStatus.color }]}
+                  >
+                    Resubmit
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+
+          {/* Menu Items */}
+          <View style={styles.menuContainer}>
+            <Text style={styles.sectionTitle}>Account Settings</Text>
+            {menuItems.map(item => (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.menuItem}
+                onPress={item.onPress}
+                activeOpacity={0.7}
+              >
+                <View
+                  style={[styles.menuIcon, { backgroundColor: item.color }]}
+                >
+                  <Ionicons name={item.icon} size={20} color={Colors.white} />
+                </View>
+                <Text style={styles.menuText}>{item.title}</Text>
+                {item.status ? (
+                  <View
+                    style={[
+                      styles.statusBadge,
+                      { backgroundColor: item.statusColor },
+                    ]}
+                  >
+                    <Text style={styles.statusText}>{item.status}</Text>
+                  </View>
+                ) : (
+                  <Ionicons
+                    name="chevron-forward"
+                    size={18}
+                    color={Colors.textLight}
+                  />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Support Section */}
+          <View style={styles.supportContainer}>
+            <Text style={styles.sectionTitle}>Support</Text>
+            <TouchableOpacity
+              style={styles.supportCard}
+              onPress={() => navigation.navigate('Contact')}
+            >
+              <View style={styles.supportIcon}>
+                <Ionicons name="help-buoy-outline" size={24} color="#6366F1" />
+              </View>
+              <View style={styles.supportContent}>
+                <Text style={styles.supportTitle}>Need Help?</Text>
+                <Text style={styles.supportSubtitle}>
+                  Contact our support team for assistance
                 </Text>
               </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.modalOption}
-              onPress={pickImage}
-              activeOpacity={0.7}
-            >
-              <View style={styles.modalIcon}>
-                <Ionicons name="image" size={24} color="#6366F1" />
-              </View>
-              <View style={styles.modalTextContainer}>
-                <Text style={styles.modalOptionText}>Choose from Gallery</Text>
-                <Text style={styles.modalOptionSubtext}>
-                  Select an existing photo from your device
-                </Text>
-              </View>
-            </TouchableOpacity>
-
-            <View style={styles.modalSeparator} />
-
-            <TouchableOpacity
-              style={styles.modalCancel}
-              onPress={() => setModalVisible(false)}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.modalCancelText}>Cancel</Text>
             </TouchableOpacity>
           </View>
-        </View>
-      </Modal>
-    </SafeAreaView>
+
+          {/* Logout Button */}
+          <TouchableOpacity
+            style={styles.logoutButton}
+            onPress={handleLogout}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="log-out-outline" size={20} color={Colors.error} />
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
+        </ScrollView>
+
+        {/* Image Picker Modal */}
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Update Profile Photo</Text>
+
+              <TouchableOpacity
+                style={styles.modalOption}
+                onPress={takePhoto}
+                activeOpacity={0.7}
+              >
+                <View style={styles.modalIcon}>
+                  <Ionicons name="camera" size={24} color="#6366F1" />
+                </View>
+                <View style={styles.modalTextContainer}>
+                  <Text style={styles.modalOptionText}>Take Photo</Text>
+                  <Text style={styles.modalOptionSubtext}>
+                    Use your camera to take a new photo
+                  </Text>
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.modalOption}
+                onPress={pickImage}
+                activeOpacity={0.7}
+              >
+                <View style={styles.modalIcon}>
+                  <Ionicons name="image" size={24} color="#6366F1" />
+                </View>
+                <View style={styles.modalTextContainer}>
+                  <Text style={styles.modalOptionText}>
+                    Choose from Gallery
+                  </Text>
+                  <Text style={styles.modalOptionSubtext}>
+                    Select an existing photo from your device
+                  </Text>
+                </View>
+              </TouchableOpacity>
+
+              <View style={styles.modalSeparator} />
+
+              <TouchableOpacity
+                style={styles.modalCancel}
+                onPress={() => setModalVisible(false)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.modalCancelText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  fullContainer: {
+    flex: 1,
+    backgroundColor: Colors.white,
+  },
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: Colors.lightBackground,
   },
   scrollView: {
     flex: 1,
   },
+  scrollContentContainer: {
+    paddingBottom: Platform.OS === 'ios' ? 40 : 60, // Extra padding for logout button
+    minHeight: height,
+  },
   profileHeader: {
-    padding: 20,
-    backgroundColor: '#FFFFFF',
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 20 : 20,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    backgroundColor: Colors.primaryBlue,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
     marginBottom: 16,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -574,9 +603,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.white,
     borderRadius: 20,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -591,7 +620,7 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
     borderWidth: 3,
-    borderColor: '#F1F5F9',
+    borderColor: Colors.borderLight,
   },
   imageLoading: {
     width: 80,
@@ -599,15 +628,15 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F1F5F9',
+    backgroundColor: Colors.borderLight,
     borderWidth: 3,
-    borderColor: '#F1F5F9',
+    borderColor: Colors.borderLight,
   },
   editImageButton: {
     position: 'absolute',
     right: -5,
     bottom: -5,
-    backgroundColor: '#6366F1',
+    backgroundColor: Colors.primaryBlue,
     width: 32,
     height: 32,
     borderRadius: 16,
@@ -615,7 +644,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 2,
     borderColor: Colors.white,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 4,
@@ -627,19 +656,19 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 20,
     fontFamily: GlobalFonts.textBold,
-    color: '#1E293B',
+    color: Colors.textDark,
     marginBottom: 6,
   },
   userId: {
     fontSize: 14,
     fontFamily: GlobalFonts.textMedium,
-    color: '#64748B',
+    color: Colors.textGray,
     marginBottom: 4,
   },
   userPhone: {
     fontSize: 14,
     fontFamily: GlobalFonts.textLight,
-    color: '#64748B',
+    color: Colors.textGray,
   },
   // KYC Banner Styles
   kycBanner: {
@@ -670,7 +699,7 @@ const styles = StyleSheet.create({
   kycMessageText: {
     fontSize: 14,
     fontFamily: GlobalFonts.textRegular,
-    color: '#64748B',
+    color: Colors.textGray,
   },
   kycActionButton: {
     paddingHorizontal: 12,
@@ -685,17 +714,17 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontFamily: GlobalFonts.textSemiBold,
-    color: '#1E293B',
+    color: Colors.textDark,
     marginBottom: 16,
     marginLeft: 4,
   },
   menuContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.white,
     marginHorizontal: 16,
     marginBottom: 20,
     borderRadius: 20,
     padding: 16,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 6,
@@ -706,7 +735,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
+    borderBottomColor: Colors.borderLight,
   },
   menuIcon: {
     width: 40,
@@ -720,7 +749,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontFamily: GlobalFonts.textMedium,
-    color: '#334155',
+    color: Colors.textLightGray,
   },
   // Status Badge Styles
   statusBadge: {
@@ -731,16 +760,16 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 12,
     fontFamily: GlobalFonts.textMedium,
-    color: '#FFFFFF',
+    color: Colors.white,
     textTransform: 'uppercase',
   },
   supportContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.white,
     marginHorizontal: 16,
     marginBottom: 24,
     borderRadius: 20,
     padding: 16,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 6,
@@ -749,7 +778,7 @@ const styles = StyleSheet.create({
   supportCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8FAFC',
+    backgroundColor: Colors.lightBackground,
     borderRadius: 16,
     padding: 16,
   },
@@ -757,7 +786,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 14,
-    backgroundColor: '#EEF2FF',
+    backgroundColor: Colors.featureBlue,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
@@ -768,32 +797,24 @@ const styles = StyleSheet.create({
   supportTitle: {
     fontSize: 16,
     fontFamily: GlobalFonts.textSemiBold,
-    color: '#1E293B',
+    color: Colors.textDark,
     marginBottom: 4,
   },
   supportSubtitle: {
     fontSize: 14,
     fontFamily: GlobalFonts.textLight,
-    color: '#64748B',
-  },
-  supportButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: '#EEF2FF',
-    justifyContent: 'center',
-    alignItems: 'center',
+    color: Colors.textGray,
   },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.white,
     padding: 16,
     borderRadius: 16,
     marginHorizontal: 16,
-    marginBottom: 30,
-    shadowColor: '#000',
+    marginBottom: Platform.OS === 'ios' ? 30 : 50, // Extra margin for Android
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 6,
@@ -802,21 +823,21 @@ const styles = StyleSheet.create({
   logoutText: {
     fontSize: 16,
     fontFamily: GlobalFonts.textMedium,
-    color: '#EF4444',
+    color: Colors.error,
     marginLeft: 10,
   },
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: Colors.transparentBlack30,
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.white,
     borderRadius: 20,
     padding: 24,
     width: width * 0.85,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -825,7 +846,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontFamily: GlobalFonts.textBold,
-    color: '#1E293B',
+    color: Colors.textDark,
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -843,7 +864,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#EEF2FF',
+    backgroundColor: Colors.featureBlue,
     marginRight: 16,
   },
   modalTextContainer: {
@@ -852,17 +873,17 @@ const styles = StyleSheet.create({
   modalOptionText: {
     fontSize: 16,
     fontFamily: GlobalFonts.textMedium,
-    color: '#1E293B',
+    color: Colors.textDark,
     marginBottom: 4,
   },
   modalOptionSubtext: {
     fontSize: 13,
     fontFamily: GlobalFonts.textLight,
-    color: '#64748B',
+    color: Colors.textGray,
   },
   modalSeparator: {
     height: 1,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: Colors.borderLight,
     marginVertical: 8,
   },
   modalCancel: {
@@ -870,13 +891,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 8,
     borderRadius: 12,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: Colors.lightBackground,
   },
   modalCancelText: {
     fontSize: 16,
     fontFamily: GlobalFonts.textMedium,
-    color: '#64748B',
+    color: Colors.textGray,
   },
 });
 
-export default AccountScreen;
+export default SettingsScreen;

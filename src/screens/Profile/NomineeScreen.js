@@ -1,8 +1,17 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Platform,
+  StatusBar,
+  KeyboardAvoidingView,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Ionicons from '@react-native-vector-icons/ionicons';
 import { GlobalFonts } from '../../config/GlobalFonts';
 import { Colors } from '../../config/Colors';
-import Icon from '@react-native-vector-icons/material-icons';
 import BackHeader from '../../components/BackHeader';
 import CustomTextInput from '../../components/CustomTextInput';
 import CustomButton from '../../components/CustomButton';
@@ -15,10 +24,10 @@ const NomineeScreen = ({ navigation }) => {
   const { profile } = useSelector(state => state.profile);
   const [updating, setUpdating] = useState(false);
   const [formData, setFormData] = useState({
-    nominee_name: 'sdjkfs',
-    relationship: 'sdf',
-    nominee_mobile: '1234567890',
-    nominee_address: 'sd,mfjsu',
+    nominee_name: '',
+    relationship: '',
+    nominee_mobile: '',
+    nominee_address: '',
   });
   const [errors, setErrors] = useState({});
   const [hasChanges, setHasChanges] = useState(false);
@@ -119,80 +128,93 @@ const NomineeScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <BackHeader
-        title="Nominee Details"
-        onBackPress={() => navigation.goBack()}
+      <StatusBar
         backgroundColor={Colors.primaryBlue}
+        barStyle="light-content"
+        translucent={Platform.OS === 'android' && Platform.Version >= 21}
       />
-
-      <ScrollView
-        style={styles.formContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.infoContainer}>
-          <Icon name="info" size={20} color={Colors.primaryBlue} />
-          <Text style={styles.infoText}>
-            Please provide your nominee details for account security purposes.
-          </Text>
-        </View>
-
-        <CustomTextInput
-          label="Nominee Name"
-          iconName="person-outline"
-          placeholder="Enter nominee's full name"
-          value={formData.nominee_name}
-          onChangeText={text => handleInputChange('nominee_name', text)}
-          error={errors.nominee_name}
-          autoCapitalize="words"
-          returnKeyType="next"
+      <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
+        <BackHeader
+          title="Nominee Details"
+          onBackPress={() => navigation.goBack()}
+          backgroundColor={Colors.primaryBlue}
         />
 
-        <CustomTextInput
-          label="Relationship"
-          iconName="people-outline"
-          placeholder="e.g., Father, Mother, Spouse, etc."
-          value={formData.relationship}
-          onChangeText={text => handleInputChange('relationship', text)}
-          error={errors.relationship}
-          autoCapitalize="words"
-          returnKeyType="next"
-        />
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.infoContainer}>
+            <Ionicons
+              name="information-circle"
+              size={20}
+              color={Colors.primaryBlue}
+            />
+            <Text style={styles.infoText}>
+              Please provide your nominee details for account security purposes.
+            </Text>
+          </View>
 
-        <CustomTextInput
-          label="Mobile Number"
-          iconName="call-outline"
-          placeholder="Enter nominee's mobile number"
-          value={formData.nominee_mobile}
-          onChangeText={text =>
-            handleInputChange('nominee_mobile', text.replace(/[^0-9]/g, ''))
-          }
-          error={errors.nominee_mobile}
-          keyboardType="phone-pad"
-          maxLength={10}
-          returnKeyType="next"
-        />
+          <CustomTextInput
+            label="Nominee Name"
+            iconName="person-outline"
+            placeholder="Enter nominee's full name"
+            value={formData.nominee_name}
+            onChangeText={text => handleInputChange('nominee_name', text)}
+            error={errors.nominee_name}
+            autoCapitalize="words"
+            returnKeyType="next"
+          />
 
-        <CustomTextInput
-          label="Address"
-          iconName="location-outline"
-          placeholder="Enter nominee's complete address"
-          value={formData.nominee_address}
-          onChangeText={text => handleInputChange('nominee_address', text)}
-          error={errors.nominee_address}
-          multiline={true}
-          numberOfLines={4}
-          returnKeyType="done"
-        />
+          <CustomTextInput
+            label="Relationship"
+            iconName="people-outline"
+            placeholder="e.g., Father, Mother, Spouse, etc."
+            value={formData.relationship}
+            onChangeText={text => handleInputChange('relationship', text)}
+            error={errors.relationship}
+            autoCapitalize="words"
+            returnKeyType="next"
+          />
 
-        <CustomButton
-          title={updating ? 'Updating...' : 'Update Nominee'}
-          onPress={handleSubmit}
-          variant="primary"
-          loading={updating}
-          disabled={updating || !hasChanges}
-          style={[!hasChanges && styles.disabledButton]}
-        />
-      </ScrollView>
+          <CustomTextInput
+            label="Mobile Number"
+            iconName="call-outline"
+            placeholder="Enter nominee's mobile number"
+            value={formData.nominee_mobile}
+            onChangeText={text =>
+              handleInputChange('nominee_mobile', text.replace(/[^0-9]/g, ''))
+            }
+            error={errors.nominee_mobile}
+            keyboardType="phone-pad"
+            maxLength={10}
+            returnKeyType="next"
+          />
+
+          <CustomTextInput
+            label="Address"
+            iconName="location-outline"
+            placeholder="Enter nominee's complete address"
+            value={formData.nominee_address}
+            onChangeText={text => handleInputChange('nominee_address', text)}
+            error={errors.nominee_address}
+            multiline={true}
+            numberOfLines={4}
+            returnKeyType="done"
+          />
+
+          <CustomButton
+            title={updating ? 'Updating...' : 'Update Nominee'}
+            onPress={handleSubmit}
+            variant="primary"
+            loading={updating}
+            disabled={updating || !hasChanges}
+            style={[!hasChanges && styles.disabledButton]}
+          />
+        </ScrollView>
+      </SafeAreaView>
     </View>
   );
 };
@@ -202,9 +224,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.lightBackground,
   },
-  formContainer: {
+  scrollView: {
     flex: 1,
-    padding: 16,
   },
   infoContainer: {
     flexDirection: 'row',
@@ -224,6 +245,14 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     opacity: 0.6,
+  },
+  safeArea: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    padding: 16,
+    paddingBottom: 30, // Extra padding to ensure button is visible
   },
 });
 

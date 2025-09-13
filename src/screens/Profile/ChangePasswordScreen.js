@@ -1,8 +1,16 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Platform,
+  StatusBar,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { GlobalFonts } from '../../config/GlobalFonts';
 import { Colors } from '../../config/Colors';
-import Icon from '@react-native-vector-icons/material-icons';
+import Ionicons from '@react-native-vector-icons/ionicons';
 import BackHeader from '../../components/BackHeader';
 import CustomTextInput from '../../components/CustomTextInput';
 import CustomButton from '../../components/CustomButton';
@@ -89,76 +97,81 @@ const ChangePasswordScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <BackHeader
-        title="Change Password"
-        onBackPress={() => navigation.goBack()}
+      <StatusBar
         backgroundColor={Colors.primaryBlue}
+        barStyle="light-content"
+        translucent={Platform.OS === 'android' && Platform.Version >= 21}
       />
-
-      <ScrollView
-        style={styles.formContainer}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.infoContainer}>
-          <Icon name="info" size={20} color={Colors.primaryBlue} />
-          <Text style={styles.infoText}>
-            Please enter your current password and set a new password for your
-            account. You will be logged out after successful password change.
-          </Text>
-        </View>
-
-        <CustomTextInput
-          label="Current Password"
-          iconName="lock-closed-outline"
-          placeholder="Enter your current password"
-          value={formData.old_password}
-          onChangeText={text => handleInputChange('old_password', text)}
-          error={errors.old_password}
-          secureTextEntry={true}
-          returnKeyType="next"
-          onSubmitEditing={() => {
-            // Focus next field logic if needed
-          }}
+      <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
+        <BackHeader
+          title="Change Password"
+          onBackPress={() => navigation.goBack()}
+          backgroundColor={Colors.primaryBlue}
         />
 
-        <CustomTextInput
-          label="New Password"
-          iconName="lock-closed-outline"
-          placeholder="Enter your new password"
-          value={formData.new_password}
-          onChangeText={text => handleInputChange('new_password', text)}
-          error={errors.new_password}
-          secureTextEntry={true}
-          returnKeyType="next"
-          onSubmitEditing={() => {
-            // Focus next field logic if needed
-          }}
-        />
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.infoContainer}>
+            <Ionicons
+              name="information-circle"
+              size={20}
+              color={Colors.primaryBlue}
+            />
+            <Text style={styles.infoText}>
+              Please enter your current password and set a new password for your
+              account. You will be logged out after successful password change.
+            </Text>
+          </View>
 
-        <CustomTextInput
-          label="Confirm New Password"
-          iconName="lock-closed-outline"
-          placeholder="Confirm your new password"
-          value={formData.new_password_confirmation}
-          onChangeText={text =>
-            handleInputChange('new_password_confirmation', text)
-          }
-          error={errors.new_password_confirmation}
-          secureTextEntry={true}
-          returnKeyType="done"
-          onSubmitEditing={handleSubmit}
-        />
+          <CustomTextInput
+            label="Current Password"
+            iconName="lock-closed-outline"
+            placeholder="Enter your current password"
+            value={formData.old_password}
+            onChangeText={text => handleInputChange('old_password', text)}
+            error={errors.old_password}
+            secureTextEntry={true}
+            returnKeyType="next"
+          />
 
-        <CustomButton
-          title={updating ? 'Updating...' : 'Change Password'}
-          onPress={handleSubmit}
-          variant="primary"
-          loading={updating}
-          disabled={updating}
-          style={styles.submitButton}
-        />
-      </ScrollView>
+          <CustomTextInput
+            label="New Password"
+            iconName="lock-closed-outline"
+            placeholder="Enter your new password"
+            value={formData.new_password}
+            onChangeText={text => handleInputChange('new_password', text)}
+            error={errors.new_password}
+            secureTextEntry={true}
+            returnKeyType="next"
+          />
+
+          <CustomTextInput
+            label="Confirm New Password"
+            iconName="lock-closed-outline"
+            placeholder="Confirm your new password"
+            value={formData.new_password_confirmation}
+            onChangeText={text =>
+              handleInputChange('new_password_confirmation', text)
+            }
+            error={errors.new_password_confirmation}
+            secureTextEntry={true}
+            returnKeyType="done"
+          />
+
+          <CustomButton
+            title={updating ? 'Updating...' : 'Change Password'}
+            onPress={handleSubmit}
+            variant="primary"
+            loading={updating}
+            disabled={updating}
+            style={styles.submitButton}
+          />
+        </ScrollView>
+      </SafeAreaView>
     </View>
   );
 };
@@ -168,9 +181,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.lightBackground,
   },
-  formContainer: {
+  safeArea: {
     flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
     padding: 16,
+    paddingBottom: 30, // Extra padding to ensure button is visible
   },
   infoContainer: {
     flexDirection: 'row',
@@ -190,6 +210,7 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     marginTop: 24,
+    marginBottom: 20, // Ensure button has space at bottom
   },
 });
 

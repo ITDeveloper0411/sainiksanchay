@@ -5,7 +5,11 @@ import {
   ScrollView,
   TouchableOpacity,
   Text,
+  Platform,
+  StatusBar,
+  KeyboardAvoidingView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../config/Colors';
 import BackHeader from '../../components/BackHeader';
 import CustomTextInput from '../../components/CustomTextInput';
@@ -275,182 +279,225 @@ const ProfileScreen = ({ navigation }) => {
     })) || [];
 
   return (
-    <View style={styles.container}>
-      <BackHeader
-        title="Edit Profile"
-        onBackPress={() => navigation.goBack()}
+    <View style={styles.fullContainer}>
+      <StatusBar
         backgroundColor={Colors.primaryBlue}
+        barStyle="light-content"
+        translucent={Platform.OS === 'android'}
       />
 
-      <ScrollView
-        style={styles.formContainer}
-        showsVerticalScrollIndicator={false}
+      <SafeAreaView
+        style={styles.container}
+        edges={['right', 'left', 'bottom']}
       >
-        <CustomTextInput
-          label="Full Name *"
-          iconName="person-outline"
-          placeholder="Enter your full name"
-          value={formData.name}
-          onChangeText={text => handleInputChange('name', text)}
-          error={errors.name}
-          autoCapitalize="words"
-          returnKeyType="next"
+        <BackHeader
+          title="Edit Profile"
+          onBackPress={() => navigation.goBack()}
+          backgroundColor={Colors.primaryBlue}
+          titleColor={Colors.white}
+          backIconColor={Colors.white}
         />
 
-        <CustomTextInput
-          label="Mobile Number *"
-          iconName="call-outline"
-          placeholder="Enter your mobile number"
-          value={formData.mobile}
-          onChangeText={text =>
-            handleInputChange('mobile', text.replace(/[^0-9]/g, ''))
-          }
-          error={errors.mobile}
-          keyboardType="phone-pad"
-          maxLength={10}
-          returnKeyType="next"
-        />
+        <KeyboardAvoidingView
+          style={styles.keyboardAvoidView}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        >
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContentContainer}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            <View style={styles.formContainer}>
+              <CustomTextInput
+                label="Full Name *"
+                iconName="person-outline"
+                placeholder="Enter your full name"
+                value={formData.name}
+                onChangeText={text => handleInputChange('name', text)}
+                error={errors.name}
+                autoCapitalize="words"
+                returnKeyType="next"
+              />
 
-        <CustomTextInput
-          label="Email ID *"
-          iconName="mail-outline"
-          placeholder="Enter your email address"
-          value={formData.emailid}
-          onChangeText={text => handleInputChange('emailid', text)}
-          error={errors.emailid}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          returnKeyType="next"
-        />
+              <CustomTextInput
+                label="Mobile Number *"
+                iconName="call-outline"
+                placeholder="Enter your mobile number"
+                value={formData.mobile}
+                onChangeText={text =>
+                  handleInputChange('mobile', text.replace(/[^0-9]/g, ''))
+                }
+                error={errors.mobile}
+                keyboardType="phone-pad"
+                maxLength={10}
+                returnKeyType="next"
+              />
 
-        <CustomTextInput
-          label="Father's Name *"
-          iconName="person-outline"
-          placeholder="Enter your father's name"
-          value={formData.father}
-          onChangeText={text => handleInputChange('father', text)}
-          error={errors.father}
-          autoCapitalize="words"
-          returnKeyType="next"
-        />
+              <CustomTextInput
+                label="Email ID *"
+                iconName="mail-outline"
+                placeholder="Enter your email address"
+                value={formData.emailid}
+                onChangeText={text => handleInputChange('emailid', text)}
+                error={errors.emailid}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                returnKeyType="next"
+              />
 
-        <TouchableOpacity onPress={showDatePicker}>
-          <CustomTextInput
-            label="Date of Birth *"
-            iconName="calendar-outline"
-            placeholder="Select your date of birth"
-            value={formData.dob}
-            editable={false}
-            error={errors.dob}
-            pointerEvents="none"
-          />
-        </TouchableOpacity>
+              <CustomTextInput
+                label="Father's Name *"
+                iconName="person-outline"
+                placeholder="Enter your father's name"
+                value={formData.father}
+                onChangeText={text => handleInputChange('father', text)}
+                error={errors.father}
+                autoCapitalize="words"
+                returnKeyType="next"
+              />
 
-        <Text style={styles.label}>Gender *</Text>
-        <SearchableDropdown
-          data={genderOptions}
-          placeholder="Select Gender *"
-          value={formData.gender}
-          onSelect={item => handleInputChange('gender', item.value)}
-          searchPlaceholder="Search gender..."
-          error={errors.gender}
-          style={styles.dropdown}
-        />
+              <TouchableOpacity onPress={showDatePicker}>
+                <CustomTextInput
+                  label="Date of Birth *"
+                  iconName="calendar-outline"
+                  placeholder="Select your date of birth"
+                  value={formData.dob}
+                  editable={false}
+                  error={errors.dob}
+                  pointerEvents="none"
+                />
+              </TouchableOpacity>
 
-        <CustomTextInput
-          label="Residential Address *"
-          iconName="location-outline"
-          placeholder="Enter your complete address"
-          value={formData.address}
-          onChangeText={text => handleInputChange('address', text)}
-          error={errors.address}
-          multiline={true}
-          numberOfLines={3}
-          returnKeyType="next"
-        />
+              <Text style={styles.label}>Gender *</Text>
+              <SearchableDropdown
+                data={genderOptions}
+                placeholder="Select Gender *"
+                value={formData.gender}
+                onSelect={item => handleInputChange('gender', item.value)}
+                searchPlaceholder="Search gender..."
+                error={errors.gender}
+                style={styles.dropdown}
+              />
 
-        <CustomTextInput
-          label="Pincode *"
-          iconName="pin-outline"
-          placeholder="Enter your pincode"
-          value={formData.pincode}
-          onChangeText={text =>
-            handleInputChange('pincode', text.replace(/[^0-9]/g, ''))
-          }
-          error={errors.pincode}
-          keyboardType="number-pad"
-          maxLength={6}
-          returnKeyType="next"
-        />
+              <CustomTextInput
+                label="Residential Address *"
+                iconName="location-outline"
+                placeholder="Enter your complete address"
+                value={formData.address}
+                onChangeText={text => handleInputChange('address', text)}
+                error={errors.address}
+                multiline={true}
+                numberOfLines={3}
+                textAlignVertical="top"
+                returnKeyType="next"
+              />
 
-        <Text style={styles.label}>State *</Text>
-        <SearchableDropdown
-          data={stateOptions}
-          placeholder="Select State"
-          value={formData.state_id}
-          onSelect={handleStateSelect}
-          searchPlaceholder="Search state..."
-          error={errors.state}
-          style={styles.dropdown}
-          loading={isLoadingStates}
-        />
+              <CustomTextInput
+                label="Pincode *"
+                iconName="pin-outline"
+                placeholder="Enter your pincode"
+                value={formData.pincode}
+                onChangeText={text =>
+                  handleInputChange('pincode', text.replace(/[^0-9]/g, ''))
+                }
+                error={errors.pincode}
+                keyboardType="number-pad"
+                maxLength={6}
+                returnKeyType="next"
+              />
 
-        <Text style={styles.label}>District *</Text>
-        <SearchableDropdown
-          data={districtOptions}
-          placeholder="Select District"
-          value={formData.district_id}
-          onSelect={handleDistrictSelect}
-          searchPlaceholder="Search district..."
-          error={errors.district}
-          style={styles.dropdown}
-          loading={isLoadingDistricts}
-          disabled={!formData.state_id}
-        />
+              <Text style={styles.label}>State *</Text>
+              <SearchableDropdown
+                data={stateOptions}
+                placeholder="Select State"
+                value={formData.state_id}
+                onSelect={handleStateSelect}
+                searchPlaceholder="Search state..."
+                error={errors.state}
+                style={styles.dropdown}
+                loading={isLoadingStates}
+              />
 
-        <CustomTextInput
-          label="Occupation *"
-          iconName="briefcase-outline"
-          placeholder="Enter your occupation"
-          value={formData.occupation}
-          onChangeText={text => handleInputChange('occupation', text)}
-          error={errors.occupation}
-          autoCapitalize="words"
-          returnKeyType="done"
-        />
+              <Text style={styles.label}>District *</Text>
+              <SearchableDropdown
+                data={districtOptions}
+                placeholder="Select District"
+                value={formData.district_id}
+                onSelect={handleDistrictSelect}
+                searchPlaceholder="Search district..."
+                error={errors.district}
+                style={styles.dropdown}
+                loading={isLoadingDistricts}
+                disabled={!formData.state_id}
+              />
 
-        <DateTimePickerModal
-          isVisible={isDatePickerVisible}
-          mode="date"
-          onConfirm={handleDateConfirm}
-          onCancel={hideDatePicker}
-          maximumDate={new Date()}
-        />
+              <CustomTextInput
+                label="Occupation *"
+                iconName="briefcase-outline"
+                placeholder="Enter your occupation"
+                value={formData.occupation}
+                onChangeText={text => handleInputChange('occupation', text)}
+                error={errors.occupation}
+                autoCapitalize="words"
+                returnKeyType="done"
+              />
 
-        <CustomButton
-          title={updating ? 'Updating...' : 'Update Profile'}
-          onPress={handleSubmit}
-          variant="primary"
-          loading={updating}
-          disabled={updating || !hasChanges}
-          style={[!hasChanges && styles.disabledButton]}
-        />
-      </ScrollView>
+              <DateTimePickerModal
+                isVisible={isDatePickerVisible}
+                mode="date"
+                onConfirm={handleDateConfirm}
+                onCancel={hideDatePicker}
+                maximumDate={new Date()}
+              />
+
+              <View style={styles.buttonContainer}>
+                <CustomButton
+                  title={updating ? 'Updating...' : 'Update Profile'}
+                  onPress={handleSubmit}
+                  variant="primary"
+                  loading={updating}
+                  disabled={updating || !hasChanges}
+                  style={[!hasChanges && styles.disabledButton]}
+                />
+              </View>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  fullContainer: {
+    flex: 1,
+    backgroundColor: Colors.primaryBlue,
+  },
   container: {
     flex: 1,
     backgroundColor: Colors.lightBackground,
   },
-  formContainer: {
+  keyboardAvoidView: {
     flex: 1,
-    padding: 16,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContentContainer: {
+    flexGrow: 1,
+    paddingBottom: 40,
+  },
+  formContainer: {
+    padding: 20,
   },
   dropdown: {
-    marginBottom: 16,
+    marginBottom: 20,
+  },
+  buttonContainer: {
+    marginTop: 10,
+    marginBottom: 30,
   },
   disabledButton: {
     opacity: 0.6,
@@ -459,6 +506,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: GlobalFonts.textSemiBold,
     color: Colors.textDark,
+    marginBottom: 8,
+    marginLeft: 4,
   },
 });
 

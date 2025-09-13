@@ -67,111 +67,122 @@ export default function LoginScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+    <View style={styles.container}>
       <StatusBar
         backgroundColor={Colors.primaryBlue}
         barStyle="light-content"
+        translucent={Platform.OS === 'android' && Platform.Version >= 21}
       />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardAvoid}
-      >
-        <ScrollView
-          contentContainerStyle={styles.scrollContainer}
-          showsVerticalScrollIndicator={false}
-          bounces={false}
+      <SafeAreaView style={styles.safeArea} edges={['left', 'right', 'bottom']}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardAvoid}
         >
-          {/* Header with Logo */}
-          <View style={styles.header}>
-            <View style={styles.logoContainer}>
-              <Image
-                source={LOGO}
-                style={styles.logoImage}
-                resizeMode="contain"
-              />
-            </View>
-            <Text style={styles.title}>Sainik Sanchay</Text>
-            <Text style={styles.subtitle}>
-              Banking Solutions for Our Heroes
-            </Text>
-          </View>
-
-          {/* Login Form with financial app styling */}
-          <View style={styles.formWrapper}>
-            <View style={styles.formShadow} />
-            <View style={styles.formContainer}>
-              <Text style={styles.loginText}>Secure Login</Text>
-              <Text style={styles.welcomeSubtext}>
-                Access your account securely
+          <ScrollView
+            contentContainerStyle={styles.scrollContainer}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+          >
+            {/* Header with Logo */}
+            <View
+              style={[
+                styles.header,
+                Platform.OS === 'android' &&
+                  Platform.Version >= 21 && {
+                    paddingTop: StatusBar.currentHeight,
+                  },
+              ]}
+            >
+              <View style={styles.logoContainer}>
+                <Image
+                  source={LOGO}
+                  style={styles.logoImage}
+                  resizeMode="contain"
+                />
+              </View>
+              <Text style={styles.title}>Sainik Sanchay</Text>
+              <Text style={styles.subtitle}>
+                Banking Solutions for Our Heroes
               </Text>
+            </View>
 
-              {/* Username Input */}
-              <CustomTextInput
-                iconName="person-outline"
-                placeholder="Customer ID / Username"
-                value={username}
-                onChangeText={setUsername}
-                autoCapitalize="none"
-                error={formErrors.username}
-              />
+            {/* Login Form with financial app styling */}
+            <View style={styles.formWrapper}>
+              <View style={styles.formShadow} />
+              <View style={styles.formContainer}>
+                <Text style={styles.loginText}>Secure Login</Text>
+                <Text style={styles.welcomeSubtext}>
+                  Access your account securely
+                </Text>
 
-              {/* Password Input */}
-              <CustomTextInput
-                iconName="lock-closed-outline"
-                placeholder="Password"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-                isPassword={true}
-                showPassword={showPassword}
-                togglePasswordVisibility={togglePasswordVisibility}
-                error={formErrors.password}
-              />
+                {/* Username Input */}
+                <CustomTextInput
+                  iconName="person-outline"
+                  placeholder="Customer ID / Username"
+                  value={username}
+                  onChangeText={setUsername}
+                  autoCapitalize="none"
+                  error={formErrors.username}
+                />
 
-              {/* Login Button with financial app styling */}
+                {/* Password Input */}
+                <CustomTextInput
+                  iconName="lock-closed-outline"
+                  placeholder="Password"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                  isPassword={true}
+                  showPassword={showPassword}
+                  togglePasswordVisibility={togglePasswordVisibility}
+                  error={formErrors.password}
+                />
 
-              <CustomButton
-                title={isLoading ? 'Authenticating...' : 'Access My Account'}
-                onPress={handleLogin}
-                variant="primary"
-                loading={isLoading}
-                disabled={isLoading}
-              />
+                {/* Login Button with financial app styling */}
 
-              {/* Security Features */}
-              <View style={styles.securityContainer}>
-                <View style={styles.securityItem}>
-                  <Ionicons
-                    name="shield-checkmark"
-                    size={16}
-                    color={Colors.success}
-                  />
-                  <Text style={styles.securityText}>Bank-grade security</Text>
+                <CustomButton
+                  title={isLoading ? 'Authenticating...' : 'Access My Account'}
+                  onPress={handleLogin}
+                  variant="primary"
+                  loading={isLoading}
+                  disabled={isLoading}
+                />
+
+                {/* Security Features */}
+                <View style={styles.securityContainer}>
+                  <View style={styles.securityItem}>
+                    <Ionicons
+                      name="shield-checkmark"
+                      size={16}
+                      color={Colors.success}
+                    />
+                    <Text style={styles.securityText}>Bank-grade security</Text>
+                  </View>
+                  <View style={styles.securityItem}>
+                    <Ionicons
+                      name="lock-closed"
+                      size={16}
+                      color={Colors.success}
+                    />
+                    <Text style={styles.securityText}>SSL encrypted</Text>
+                  </View>
                 </View>
-                <View style={styles.securityItem}>
-                  <Ionicons
-                    name="lock-closed"
-                    size={16}
-                    color={Colors.success}
-                  />
-                  <Text style={styles.securityText}>SSL encrypted</Text>
-                </View>
-              </View>
 
-              {/* Sign Up Link */}
-              <View style={styles.signupContainer}>
-                <Text style={styles.signupText}>New to Sainik Sanchay? </Text>
-                <TouchableOpacity
-                  onPress={() => navigation.navigate('Register')}
-                >
-                  <Text style={styles.signupLink}>Register Here</Text>
-                </TouchableOpacity>
+                {/* Sign Up Link */}
+                <View style={styles.signupContainer}>
+                  <Text style={styles.signupText}>New to Sainik Sanchay? </Text>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate('Register')}
+                  >
+                    <Text style={styles.signupLink}>Register Here</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </View>
   );
 }
 
@@ -179,6 +190,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.lightBackground,
+  },
+  safeArea: {
+    flex: 1,
   },
   keyboardAvoid: {
     flex: 1,

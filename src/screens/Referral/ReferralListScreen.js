@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   Share,
   RefreshControl,
-  Dimensions,
 } from 'react-native';
 import { GlobalFonts } from '../../config/GlobalFonts';
 import { Colors } from '../../config/Colors';
@@ -17,10 +16,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ShowToast } from '../../components/ShowToast';
 import Icon from '@react-native-vector-icons/material-icons';
 import BackHeader from '../../components/BackHeader';
-import { ANDROID_PACKAGE_NAME } from '../../config/Constant';
+import { ANDROID_PACKAGE_NAME, WIDTH } from '../../config/Constant';
 import Loader from '../../components/Loader';
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const ReferralListScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -60,19 +57,24 @@ const ReferralListScreen = ({ navigation }) => {
   const shareReferralCode = async () => {
     try {
       const appLink = `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE_NAME}`;
-      const referralMessage = `🌟 Join me on Sainik Sanchay! 🌟
+      const referralMessage = `🚀 Join me on Sainik Sanchay and get ₹40 cashback! 🚀
 
-Use my referral (SAM) code: ${profile?.username || 'N/A'}
+Use my referral code: ${profile?.username || 'N/A'}
 
-Download the app now: ${appLink}
+Download the Sainik Sanchay app now:
+${appLink}
+
+✅ Get ₹40 cashback when you join using my code
+✅ Exclusive benefits for military community
+✅ Secure and reliable platform
 
 Let's grow together! 💪
 
-#SainikSanchay #Referral`;
+#SainikSanchay #Referral #Cashback`;
 
       const shareOptions = {
         message: referralMessage,
-        title: 'Join Sainik Sanchay - Refer a Friend',
+        title: 'Join Sainik Sanchay - Get ₹40 Cashback!',
       };
 
       await Share.share(shareOptions);
@@ -196,7 +198,8 @@ Let's grow together! 💪
 
       {/* Members List */}
       <ScrollView
-        style={styles.listContainer}
+        style={styles.scrollView}
+        contentContainerStyle={styles.listContainer}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -205,6 +208,7 @@ Let's grow together! 💪
             tintColor={Colors.primaryBlue}
           />
         }
+        showsVerticalScrollIndicator={false}
       >
         {referralList?.length === 0 ? (
           <View style={styles.emptyContainer}>
@@ -274,6 +278,9 @@ Let's grow together! 💪
             </View>
           ))
         )}
+
+        {/* Add extra space at the bottom to prevent card cutoff */}
+        <View style={styles.bottomPadding} />
       </ScrollView>
     </View>
   );
@@ -283,6 +290,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.lightBackground,
+  },
+  scrollView: {
+    flex: 1,
   },
   centerContainer: {
     flex: 1,
@@ -311,7 +321,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   statCard: {
-    width: (SCREEN_WIDTH - 32 - 30) / 4, // Equal width with spacing
+    width: (WIDTH - 32 - 30) / 4, // Equal width with spacing
     padding: 12,
     borderRadius: 10,
     justifyContent: 'space-between',
@@ -365,8 +375,8 @@ const styles = StyleSheet.create({
     fontFamily: GlobalFonts.textSemiBold,
   },
   listContainer: {
-    flex: 1,
     padding: 16,
+    paddingBottom: 30, // Added extra padding at the bottom
   },
   emptyContainer: {
     alignItems: 'center',
@@ -483,6 +493,9 @@ const styles = StyleSheet.create({
     fontFamily: GlobalFonts.textMedium,
     marginLeft: 8,
     flex: 1,
+  },
+  bottomPadding: {
+    height: 20, // Extra space to ensure cards are not hidden
   },
 });
 

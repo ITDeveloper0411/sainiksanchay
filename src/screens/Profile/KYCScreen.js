@@ -233,14 +233,7 @@ const KYCScreen = ({ navigation }) => {
     } finally {
       setUpdating(false);
     }
-  }, [
-    formData,
-    validateForm,
-    hasChanges,
-    dispatch,
-    navigation,
-    prepareFormData,
-  ]);
+  }, [validateForm, hasChanges, dispatch, navigation, prepareFormData]);
 
   const handleInputChange = useCallback(
     (field, value) => {
@@ -273,7 +266,8 @@ const KYCScreen = ({ navigation }) => {
       />
 
       <ScrollView
-        style={styles.formContainer}
+        style={styles.scrollView}
+        contentContainerStyle={styles.formContainer}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.infoContainer}>
@@ -347,8 +341,11 @@ const KYCScreen = ({ navigation }) => {
           variant="primary"
           loading={updating}
           disabled={updating || !hasChanges}
-          style={[!hasChanges && styles.disabledButton]}
+          style={[styles.submitButton, !hasChanges && styles.disabledButton]}
         />
+
+        {/* Add extra padding at the bottom to ensure button is visible */}
+        <View style={styles.bottomPadding} />
       </ScrollView>
     </View>
   );
@@ -359,9 +356,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.lightBackground,
   },
-  formContainer: {
+  scrollView: {
     flex: 1,
+  },
+  formContainer: {
     padding: 16,
+    paddingBottom: 30, // Added extra padding at the bottom
   },
   infoContainer: {
     flexDirection: 'row',
@@ -388,8 +388,15 @@ const styles = StyleSheet.create({
   halfWidth: {
     flex: 1,
   },
+  submitButton: {
+    marginTop: 10,
+    marginBottom: 10,
+  },
   disabledButton: {
     opacity: 0.6,
+  },
+  bottomPadding: {
+    height: 20, // Extra space to ensure button is not hidden
   },
   imageContainer: {
     marginBottom: 16,

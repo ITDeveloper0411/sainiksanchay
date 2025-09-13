@@ -1,6 +1,12 @@
-// BottomNavigation.js (Fixed Icon Containment)
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Platform,
+  Dimensions,
+} from 'react-native';
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -10,6 +16,7 @@ import { GlobalFonts } from '../config/GlobalFonts';
 
 const BottomNavigation = ({ navigation, state }) => {
   const insets = useSafeAreaInsets();
+  const screenHeight = Dimensions.get('window').height;
 
   const tabs = [
     {
@@ -24,12 +31,24 @@ const BottomNavigation = ({ navigation, state }) => {
     },
   ];
 
+  // Calculate responsive bottom padding based on screen height
+  const getBottomPadding = () => {
+    if (Platform.OS === 'ios') {
+      return Math.max(insets.bottom, 16);
+    } else {
+      // For Android, use a percentage of screen height
+      return screenHeight < 700 ? 8 : 16;
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom']}>
       <View
         style={[
           styles.container,
-          { paddingBottom: Math.max(insets.bottom, 0) },
+          {
+            paddingBottom: getBottomPadding(),
+          },
         ]}
       >
         <View style={styles.navBar}>
@@ -80,13 +99,18 @@ const styles = StyleSheet.create({
     right: 0,
     borderTopWidth: 1,
     borderTopColor: Colors.borderLight,
+    shadowColor: Colors.shadow,
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 10,
   },
   container: {
     paddingHorizontal: 0,
   },
   navBar: {
     flexDirection: 'row',
-    height: 60,
+    height: Platform.OS === 'ios' ? 60 : 56, // Slightly smaller on Android
     backgroundColor: Colors.white,
   },
   navItem: {
@@ -110,14 +134,14 @@ const styles = StyleSheet.create({
     // Add any active icon styling if needed
   },
   emojiIcon: {
-    fontSize: 18, // Slightly smaller to ensure it fits
+    fontSize: 18,
   },
   label: {
-    fontSize: 11, // Slightly smaller font
+    fontSize: 11,
     fontFamily: GlobalFonts.textMedium,
   },
   activeLabel: {
-    color: Colors.primaryDark,
+    color: Colors.primaryBlue,
     fontFamily: GlobalFonts.textSemiBold,
   },
   inactiveLabel: {
@@ -129,7 +153,7 @@ const styles = StyleSheet.create({
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: Colors.primaryDark,
+    backgroundColor: Colors.primaryBlue,
   },
 });
 

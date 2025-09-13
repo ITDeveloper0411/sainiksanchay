@@ -1,7 +1,6 @@
 // config/Colors.js
 export const Colors = {
   // Main colors
-  primaryDark: '#0a1e33',
   primary: '#0f2b46',
   primaryLight: '#1a365d',
   primaryBlue: '#0d2b4b',

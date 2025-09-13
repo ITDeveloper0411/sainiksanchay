@@ -9,6 +9,7 @@ import {
   FlatList,
   Animated,
   Easing,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'react-native-linear-gradient';
@@ -203,118 +204,124 @@ const StartedScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar
         barStyle="light-content"
-        backgroundColor={Colors.primaryDark}
+        backgroundColor={Colors.primaryBlue}
+        translucent={Platform.OS === 'android' && Platform.Version >= 21}
       />
 
-      {/* Premium Header Design */}
-      <LinearGradient
-        colors={[Colors.primaryDark, Colors.primary, Colors.primaryLight]}
-        style={styles.header}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        {/* Decorative Elements */}
-        <View style={styles.headerPattern} />
-        <View style={styles.cornerAccentTopLeft} />
-        <View style={styles.cornerAccentTopRight} />
-
-        <View style={styles.headerContent}>
-          <View style={styles.logoContainer}>
-            <Image source={LOGO} style={styles.logo} resizeMode="contain" />
-            <View style={styles.logoGlow} />
-          </View>
-
-          <View style={styles.headerTextContainer}>
-            <View style={styles.headerBadge}>
-              <Ionicons name="ribbon" size={14} color={Colors.white} />
-              <Text style={styles.headerBadgeText}>Service First</Text>
-            </View>
-            <Text style={styles.headerTitle}>Sainik Sanchay</Text>
-            <Text style={styles.headerSubtitle}>Banking for Our Heroes</Text>
-
-            <View style={styles.headerDivider}>
-              <View style={styles.dividerLine} />
-              <Ionicons
-                name="shield-checkmark"
-                size={16}
-                color={Colors.accentBlue}
-              />
-              <View style={styles.dividerLine} />
-            </View>
-          </View>
-        </View>
-      </LinearGradient>
-
-      {/* Main Content with Horizontal Scroll */}
-      <View style={styles.flatListContainer}>
-        <FlatList
-          ref={flatListRef}
-          data={infoData}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          onScroll={handleScroll}
-          scrollEventThrottle={16}
-          contentContainerStyle={styles.flatListContent}
-          getItemLayout={(data, index) => ({
-            length: WIDTH,
-            offset: WIDTH * index,
-            index,
-          })}
-        />
-
-        {/* New Indicator Design */}
-        <View style={styles.indicatorContainer}>
-          {infoData.map((_, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => scrollToIndex(index)}
-              style={styles.indicatorButton}
-            >
-              <View
-                style={[
-                  styles.indicatorLine,
-                  {
-                    backgroundColor:
-                      index === activeIndex
-                        ? Colors.indicatorActive
-                        : Colors.indicatorInactive,
-                    width: index === activeIndex ? 30 : 20,
-                  },
-                ]}
-              />
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-
-      {/* Get Started Button - Only show on the last screen */}
-      {activeIndex === infoData.length - 1 && (
-        <Animated.View
+      <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
+        {/* Premium Header Design */}
+        <LinearGradient
+          colors={[Colors.primaryBlue, Colors.primary, Colors.primaryLight]}
           style={[
-            styles.getStartedContainer,
-            { transform: [{ scale: buttonScale }] },
+            styles.header,
+            Platform.OS === 'android' &&
+              Platform.Version >= 21 && { paddingTop: StatusBar.currentHeight },
           ]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
         >
-          <TouchableOpacity
-            style={styles.getStartedButton}
-            onPress={() => {
-              // Handle get started actions
-              navigation.navigate('Login');
-            }}
-            activeOpacity={0.7}
+          {/* Decorative Elements */}
+          <View style={styles.headerPattern} />
+          <View style={styles.cornerAccentTopLeft} />
+          <View style={styles.cornerAccentTopRight} />
+
+          <View style={styles.headerContent}>
+            <View style={styles.logoContainer}>
+              <Image source={LOGO} style={styles.logo} resizeMode="contain" />
+            </View>
+
+            <View style={styles.headerTextContainer}>
+              <View style={styles.headerBadge}>
+                <Ionicons name="ribbon" size={14} color={Colors.white} />
+                <Text style={styles.headerBadgeText}>Service First</Text>
+              </View>
+              <Text style={styles.headerTitle}>Sainik Sanchay</Text>
+              <Text style={styles.headerSubtitle}>Banking for Our Heroes</Text>
+
+              <View style={styles.headerDivider}>
+                <View style={styles.dividerLine} />
+                <Ionicons
+                  name="shield-checkmark"
+                  size={16}
+                  color={Colors.accentBlue}
+                />
+                <View style={styles.dividerLine} />
+              </View>
+            </View>
+          </View>
+        </LinearGradient>
+
+        {/* Main Content with Horizontal Scroll */}
+        <View style={styles.flatListContainer}>
+          <FlatList
+            ref={flatListRef}
+            data={infoData}
+            renderItem={renderItem}
+            keyExtractor={item => item.id}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
+            contentContainerStyle={styles.flatListContent}
+            getItemLayout={(data, index) => ({
+              length: WIDTH,
+              offset: WIDTH * index,
+              index,
+            })}
+          />
+
+          {/* New Indicator Design */}
+          <View style={styles.indicatorContainer}>
+            {infoData.map((_, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => scrollToIndex(index)}
+                style={styles.indicatorButton}
+              >
+                <View
+                  style={[
+                    styles.indicatorLine,
+                    {
+                      backgroundColor:
+                        index === activeIndex
+                          ? Colors.indicatorActive
+                          : Colors.indicatorInactive,
+                      width: index === activeIndex ? 30 : 20,
+                    },
+                  ]}
+                />
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* Get Started Button - Only show on the last screen */}
+        {activeIndex === infoData.length - 1 && (
+          <Animated.View
+            style={[
+              styles.getStartedContainer,
+              { transform: [{ scale: buttonScale }] },
+            ]}
           >
-            <Text style={styles.getStartedText}>Get Started</Text>
-            <Ionicons name="arrow-forward" size={22} color={Colors.white} />
-          </TouchableOpacity>
-        </Animated.View>
-      )}
-    </SafeAreaView>
+            <TouchableOpacity
+              style={styles.getStartedButton}
+              onPress={() => {
+                // Handle get started actions
+                navigation.navigate('Login');
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.getStartedText}>Get Started</Text>
+              <Ionicons name="arrow-forward" size={22} color={Colors.white} />
+            </TouchableOpacity>
+          </Animated.View>
+        )}
+      </SafeAreaView>
+    </View>
   );
 };
 
@@ -322,6 +329,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.lightBackground,
+  },
+  safeArea: {
+    flex: 1,
   },
   header: {
     paddingHorizontal: 20,
@@ -393,16 +403,6 @@ const styles = StyleSheet.create({
     height: 70,
     zIndex: 2,
     position: 'relative',
-  },
-  logoGlow: {
-    position: 'absolute',
-    top: '25%',
-    left: '25%',
-    width: '50%',
-    height: '50%',
-    borderRadius: 100,
-    backgroundColor: Colors.transparentBlue40,
-    zIndex: 1,
   },
   headerTextContainer: {
     alignItems: 'center',

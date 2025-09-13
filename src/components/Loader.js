@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
   },
   loaderText: {
     fontSize: 16,
-    color: Colors.primaryDark,
+    color: Colors.primaryBlue,
     fontFamily: GlobalFonts.textBold.fontFamily,
   },
 });

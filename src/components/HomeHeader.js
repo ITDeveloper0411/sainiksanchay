@@ -5,13 +5,15 @@ import {
   Image,
   StyleSheet,
   ActivityIndicator,
-  TouchableOpacity,
+  Platform,
+  StatusBar,
 } from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { GlobalFonts } from '../config/GlobalFonts';
 import { Colors } from '../config/Colors';
 import { useSelector } from 'react-redux';
-import { LOGO } from '../config/Constant'; // Assuming you have a default logo
+import { LOGO } from '../config/Constant';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const HomeHeader = ({ navigation }) => {
   const { profile } = useSelector(state => state.profile);
@@ -28,53 +30,73 @@ const HomeHeader = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.header}>
-      <View style={styles.profileContainer}>
-        <TouchableOpacity
-          style={styles.imageContainer}
-          onPress={() => navigation.navigate('Profile')}
-        >
-          {imageLoading && (
-            <ActivityIndicator
-              style={styles.loader}
-              color={Colors.white}
-              size="small"
-            />
-          )}
-          <Image
-            source={
-              imageError || !profile?.profile_img
-                ? LOGO
-                : { uri: profile.profile_img }
-            }
-            style={[styles.profileImage, imageLoading && styles.hiddenImage]}
-            onError={handleImageError}
-            onLoad={handleImageLoad}
-            resizeMode="cover"
-          />
-        </TouchableOpacity>
-        <View style={styles.userInfo}>
-          <Text style={styles.userName} numberOfLines={1} ellipsizeMode="tail">
-            {profile?.name || 'User Name'}
-          </Text>
-          <Text style={styles.userId}>
-            SAM ID : {profile?.username || 'N/A'}
-          </Text>
+    <SafeAreaView
+      edges={['top']}
+      style={{ backgroundColor: Colors.primaryBlue }}
+    >
+      <View style={styles.headerContainer}>
+        {/* Custom Status Bar for Android 15+ */}
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor={Colors.primaryBlue}
+          translucent={Platform.OS === 'android' && Platform.Version >= 21}
+        />
+
+        <View style={styles.header}>
+          <View style={styles.profileContainer}>
+            <View style={styles.imageContainer}>
+              {imageLoading && (
+                <ActivityIndicator
+                  style={styles.loader}
+                  color={Colors.white}
+                  size="small"
+                />
+              )}
+              <Image
+                source={
+                  imageError || !profile?.profile_img
+                    ? LOGO
+                    : { uri: profile.profile_img }
+                }
+                style={[
+                  styles.profileImage,
+                  imageLoading && styles.hiddenImage,
+                ]}
+                onError={handleImageError}
+                onLoad={handleImageLoad}
+                resizeMode="cover"
+              />
+            </View>
+            <View style={styles.userInfo}>
+              <Text
+                style={styles.userName}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {profile?.name || 'User Name'}
+              </Text>
+              <Text style={styles.userId}>
+                SAM ID : {profile?.username || 'N/A'}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.incomeContainer}>
+            <Ionicons name="wallet-outline" size={20} color={Colors.success} />
+            <Text style={styles.incomeAmount}>
+              {profile?.refAmount ? `₹${profile.refAmount}` : '₹0'}
+            </Text>
+          </View>
         </View>
       </View>
-      <View style={styles.incomeContainer}>
-        <Ionicons name="wallet-outline" size={20} color={Colors.success} />
-        <Text style={styles.incomeAmount}>
-          {profile?.refAmount ? `₹${profile.refAmount}` : '₹0'}
-        </Text>
-      </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  header: {
+  headerContainer: {
     backgroundColor: Colors.primaryBlue,
+  },
+  header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
