@@ -1,5 +1,5 @@
 {
-  "name": "SainikSanchay",
+  "name": "sainiksanchay",
   "version": "0.0.1",
   "author": "Hitesh Rawat",
   "private": true,
@@ -15,22 +15,17 @@
     "@react-native-camera-roll/camera-roll": "^7.10.2",
     "@react-native-clipboard/clipboard": "^1.16.3",
     "@react-native-community/datetimepicker": "^8.4.4",
-    "@react-native-vector-icons/feather": "^12.3.0",
-    "@react-native-vector-icons/fontawesome": "^12.3.0",
     "@react-native-vector-icons/ionicons": "^12.3.0",
     "@react-native-vector-icons/material-icons": "^12.3.0",
     "@react-native/new-app-screen": "0.81.1",
     "@react-navigation/bottom-tabs": "^7.4.7",
     "@react-navigation/native": "^7.1.17",
     "@react-navigation/stack": "^7.4.8",
-    "expo-media-library": "^17.1.7",
-    "expo-modules-core": "^2.5.0",
     "lottie-react-native": "^7.3.4",
     "react": "^19.1.0",
     "react-native": "0.81.1",
     "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "^2.28.0",
-    "react-native-image-crop-picker": "^0.51.0",
     "react-native-image-picker": "^8.2.1",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-modal-datetime-picker": "^18.0.0",
@@ -41,7 +36,7 @@
     "react-redux": "^9.2.0",
     "redux": "^5.0.1",
     "redux-thunk": "^3.1.0",
-    "rn-fetch-blob": "^0.12.0"
+    "sp-react-native-in-app-updates": "^1.5.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

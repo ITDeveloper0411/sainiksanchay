@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@react-native-vector-icons/ionicons';
-import ImagePicker from 'react-native-image-crop-picker';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { GlobalFonts } from '../../config/GlobalFonts';
 import { Colors } from '../../config/Colors';
 import { useDispatch, useSelector } from 'react-redux';
@@ -160,9 +160,9 @@ const SettingsScreen = ({ navigation }) => {
       // Create form data for the image
       const formData = new FormData();
       formData.append('profile_img', {
-        uri: imageData.path,
-        type: imageData.mime,
-        name: imageData.filename || `profile_${Date.now()}.jpg`,
+        uri: imageData.uri,
+        type: imageData.type,
+        name: imageData.fileName || `profile_${Date.now()}.jpg`,
       });
 
       // Dispatch the action to update profile image
@@ -174,7 +174,7 @@ const SettingsScreen = ({ navigation }) => {
       await dispatch(profileActions.getProfile());
 
       if (result && result.success) {
-        setImage(imageData.path);
+        setImage(imageData.uri);
         ShowToast('Profile image updated successfully!');
       } else {
         throw new Error(result?.message || 'Upload failed');
@@ -199,23 +199,29 @@ const SettingsScreen = ({ navigation }) => {
     }
 
     try {
-      const result = await ImagePicker.openPicker({
-        width: 400,
-        height: 400,
-        cropping: true,
-        cropperCircleOverlay: true,
-        compressImageQuality: 0.8,
+      const options = {
         mediaType: 'photo',
+        quality: 0.8,
+        maxWidth: 400,
+        maxHeight: 400,
         includeBase64: false,
-      });
+      };
 
-      // Upload the image to server
-      await uploadProfileImage(result);
+      launchImageLibrary(options, response => {
+        if (response.didCancel) {
+          console.log('User cancelled image picker');
+        } else if (response.error) {
+          console.error('ImagePicker Error: ', response.error);
+          Alert.alert('Error', 'Failed to pick image');
+        } else if (response.assets && response.assets.length > 0) {
+          const imageData = response.assets[0];
+          // Upload the image to server
+          uploadProfileImage(imageData);
+        }
+      });
     } catch (error) {
-      if (error.code !== 'E_PICKER_CANCELLED') {
-        console.error('Image picker error:', error);
-        Alert.alert('Error', 'Failed to pick image');
-      }
+      console.error('Image picker error:', error);
+      Alert.alert('Error', 'Failed to pick image');
     }
   };
 
@@ -231,23 +237,30 @@ const SettingsScreen = ({ navigation }) => {
     }
 
     try {
-      const result = await ImagePicker.openCamera({
-        width: 400,
-        height: 400,
-        cropping: true,
-        cropperCircleOverlay: true,
-        compressImageQuality: 0.8,
+      const options = {
         mediaType: 'photo',
+        quality: 0.8,
+        maxWidth: 400,
+        maxHeight: 400,
         includeBase64: false,
-      });
+        saveToPhotos: true, // Save the taken photo to device's gallery
+      };
 
-      // Upload the image to server
-      await uploadProfileImage(result);
+      launchCamera(options, response => {
+        if (response.didCancel) {
+          console.log('User cancelled camera');
+        } else if (response.error) {
+          console.error('Camera Error: ', response.error);
+          Alert.alert('Error', 'Failed to take photo');
+        } else if (response.assets && response.assets.length > 0) {
+          const imageData = response.assets[0];
+          // Upload the image to server
+          uploadProfileImage(imageData);
+        }
+      });
     } catch (error) {
-      if (error.code !== 'E_PICKER_CANCELLED') {
-        console.error('Camera error:', error);
-        Alert.alert('Error', 'Failed to take photo');
-      }
+      console.error('Camera error:', error);
+      Alert.alert('Error', 'Failed to take photo');
     }
   };
 
@@ -621,6 +634,7 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     borderWidth: 3,
     borderColor: Colors.borderLight,
+    resizeMode: 'contain',
   },
   imageLoading: {
     width: 80,
@@ -698,7 +712,7 @@ const styles = StyleSheet.create({
   },
   kycMessageText: {
     fontSize: 14,
-    fontFamily: GlobalFonts.textRegular,
+    fontFamily: GlobalFonts.textLight,
     color: Colors.textGray,
   },
   kycActionButton: {
@@ -706,6 +720,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 8,
     borderWidth: 1,
+    borderColor: Colors.error,
   },
   kycActionText: {
     fontSize: 14,
