@@ -7,150 +7,26 @@ import {
   TouchableOpacity,
   Image,
   Alert,
-  Modal,
   ActivityIndicator,
   Platform,
-  PermissionsAndroid,
-  Linking,
   StatusBar,
-  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@react-native-vector-icons/ionicons';
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import { launchImageLibrary } from 'react-native-image-picker';
 import { GlobalFonts } from '../../config/GlobalFonts';
 import { Colors } from '../../config/Colors';
 import { useDispatch, useSelector } from 'react-redux';
 import * as authActions from '../../store/actions/auth';
 import * as profileActions from '../../store/actions/profile';
-import { LOGO } from '../../config/Constant';
+import { HEIGHT, LOGO } from '../../config/Constant';
 import { ShowToast } from '../../components/ShowToast';
-
-const { width, height } = Dimensions.get('window');
 
 const SettingsScreen = ({ navigation }) => {
   const { profile } = useSelector(state => state.profile);
   const dispatch = useDispatch();
   const [image, setImage] = useState(profile?.profile_img || null);
   const [uploading, setUploading] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-
-  // Check Android version
-  const isAndroid13OrAbove =
-    Platform.OS === 'android' && Platform.Version >= 33;
-
-  // Request camera permissions for Android
-  const requestCameraPermission = async () => {
-    if (Platform.OS === 'android') {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.CAMERA,
-          {
-            title: 'Camera Permission',
-            message: 'This app needs access to your camera to take photos',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
-          },
-        );
-
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          return true;
-        } else if (granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
-          // Permission denied permanently - show alert with settings option
-          Alert.alert(
-            'Permission Denied',
-            'Camera permission has been permanently denied. Please enable it in app settings.',
-            [
-              { text: 'Cancel', style: 'cancel' },
-              { text: 'Open Settings', onPress: () => Linking.openSettings() },
-            ],
-          );
-          return false;
-        } else {
-          return false;
-        }
-      } catch (err) {
-        console.warn('Camera permission error:', err);
-        return false;
-      }
-    }
-    return true;
-  };
-
-  // Request gallery permissions for Android - handles all versions
-  const requestGalleryPermission = async () => {
-    if (Platform.OS === 'android') {
-      try {
-        let permission;
-
-        // For Android 13+ (API level 33) we need READ_MEDIA_IMAGES
-        if (isAndroid13OrAbove) {
-          permission = PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES;
-        } else {
-          // For older Android versions
-          permission = PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
-        }
-
-        const granted = await PermissionsAndroid.request(permission, {
-          title: 'Gallery Permission',
-          message: 'This app needs access to your photos to select images',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        });
-
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          return true;
-        } else if (granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
-          // Permission denied permanently - show alert with settings option
-          Alert.alert(
-            'Permission Denied',
-            'Gallery permission has been permanently denied. Please enable it in app settings.',
-            [
-              { text: 'Cancel', style: 'cancel' },
-              { text: 'Open Settings', onPress: () => Linking.openSettings() },
-            ],
-          );
-          return false;
-        } else {
-          return false;
-        }
-      } catch (err) {
-        console.warn('Gallery permission error:', err);
-        return false;
-      }
-    }
-    return true;
-  };
-
-  // Check if we already have permissions
-  const checkExistingPermissions = async () => {
-    if (Platform.OS === 'android') {
-      try {
-        let cameraGranted = await PermissionsAndroid.check(
-          PermissionsAndroid.PERMISSIONS.CAMERA,
-        );
-
-        let galleryGranted;
-        if (isAndroid13OrAbove) {
-          galleryGranted = await PermissionsAndroid.check(
-            PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-          );
-        } else {
-          galleryGranted = await PermissionsAndroid.check(
-            PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-          );
-        }
-
-        return { cameraGranted, galleryGranted };
-      } catch (err) {
-        console.warn('Permission check error:', err);
-        return { cameraGranted: false, galleryGranted: false };
-      }
-    }
-    return { cameraGranted: true, galleryGranted: true };
-  };
 
   // Improved image upload function with better error handling
   const uploadProfileImage = async imageData => {
@@ -188,16 +64,6 @@ const SettingsScreen = ({ navigation }) => {
   };
 
   const pickImage = async () => {
-    setModalVisible(false);
-
-    // First check if we already have permissions
-    const { galleryGranted } = await checkExistingPermissions();
-
-    if (!galleryGranted) {
-      const hasPermission = await requestGalleryPermission();
-      if (!hasPermission) return;
-    }
-
     try {
       const options = {
         mediaType: 'photo',
@@ -222,45 +88,6 @@ const SettingsScreen = ({ navigation }) => {
     } catch (error) {
       console.error('Image picker error:', error);
       Alert.alert('Error', 'Failed to pick image');
-    }
-  };
-
-  const takePhoto = async () => {
-    setModalVisible(false);
-
-    // First check if we already have permissions
-    const { cameraGranted } = await checkExistingPermissions();
-
-    if (!cameraGranted) {
-      const hasPermission = await requestCameraPermission();
-      if (!hasPermission) return;
-    }
-
-    try {
-      const options = {
-        mediaType: 'photo',
-        quality: 0.8,
-        maxWidth: 400,
-        maxHeight: 400,
-        includeBase64: false,
-        saveToPhotos: true, // Save the taken photo to device's gallery
-      };
-
-      launchCamera(options, response => {
-        if (response.didCancel) {
-          console.log('User cancelled camera');
-        } else if (response.error) {
-          console.error('Camera Error: ', response.error);
-          Alert.alert('Error', 'Failed to take photo');
-        } else if (response.assets && response.assets.length > 0) {
-          const imageData = response.assets[0];
-          // Upload the image to server
-          uploadProfileImage(imageData);
-        }
-      });
-    } catch (error) {
-      console.error('Camera error:', error);
-      Alert.alert('Error', 'Failed to take photo');
     }
   };
 
@@ -399,7 +226,7 @@ const SettingsScreen = ({ navigation }) => {
                 )}
                 <TouchableOpacity
                   style={styles.editImageButton}
-                  onPress={() => setModalVisible(true)}
+                  onPress={pickImage}
                   disabled={uploading}
                 >
                   <Ionicons name="camera" size={16} color={Colors.white} />
@@ -519,64 +346,6 @@ const SettingsScreen = ({ navigation }) => {
             <Text style={styles.logoutText}>Logout</Text>
           </TouchableOpacity>
         </ScrollView>
-
-        {/* Image Picker Modal */}
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Update Profile Photo</Text>
-
-              <TouchableOpacity
-                style={styles.modalOption}
-                onPress={takePhoto}
-                activeOpacity={0.7}
-              >
-                <View style={styles.modalIcon}>
-                  <Ionicons name="camera" size={24} color="#6366F1" />
-                </View>
-                <View style={styles.modalTextContainer}>
-                  <Text style={styles.modalOptionText}>Take Photo</Text>
-                  <Text style={styles.modalOptionSubtext}>
-                    Use your camera to take a new photo
-                  </Text>
-                </View>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.modalOption}
-                onPress={pickImage}
-                activeOpacity={0.7}
-              >
-                <View style={styles.modalIcon}>
-                  <Ionicons name="image" size={24} color="#6366F1" />
-                </View>
-                <View style={styles.modalTextContainer}>
-                  <Text style={styles.modalOptionText}>
-                    Choose from Gallery
-                  </Text>
-                  <Text style={styles.modalOptionSubtext}>
-                    Select an existing photo from your device
-                  </Text>
-                </View>
-              </TouchableOpacity>
-
-              <View style={styles.modalSeparator} />
-
-              <TouchableOpacity
-                style={styles.modalCancel}
-                onPress={() => setModalVisible(false)}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.modalCancelText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
       </SafeAreaView>
     </View>
   );
@@ -595,8 +364,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContentContainer: {
-    paddingBottom: Platform.OS === 'ios' ? 40 : 60, // Extra padding for logout button
-    minHeight: height,
+    paddingBottom: 80, // Increased padding to ensure logout button is visible
+    minHeight: HEIGHT,
   },
   profileHeader: {
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 20 : 20,
@@ -730,7 +499,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: GlobalFonts.textSemiBold,
     color: Colors.textDark,
-    marginBottom: 16,
+    marginBottom: 10,
     marginLeft: 4,
   },
   menuContainer: {
@@ -748,7 +517,7 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 14,
+    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: Colors.borderLight,
   },
@@ -828,7 +597,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 16,
     marginHorizontal: 16,
-    marginBottom: Platform.OS === 'ios' ? 30 : 50, // Extra margin for Android
+    marginBottom: 30,
     shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
@@ -840,78 +609,6 @@ const styles = StyleSheet.create({
     fontFamily: GlobalFonts.textMedium,
     color: Colors.error,
     marginLeft: 10,
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.transparentBlack30,
-  },
-  modalContent: {
-    backgroundColor: Colors.white,
-    borderRadius: 20,
-    padding: 24,
-    width: width * 0.85,
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 10,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontFamily: GlobalFonts.textBold,
-    color: Colors.textDark,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  modalOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 10,
-    borderRadius: 12,
-    marginBottom: 8,
-  },
-  modalIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.featureBlue,
-    marginRight: 16,
-  },
-  modalTextContainer: {
-    flex: 1,
-  },
-  modalOptionText: {
-    fontSize: 16,
-    fontFamily: GlobalFonts.textMedium,
-    color: Colors.textDark,
-    marginBottom: 4,
-  },
-  modalOptionSubtext: {
-    fontSize: 13,
-    fontFamily: GlobalFonts.textLight,
-    color: Colors.textGray,
-  },
-  modalSeparator: {
-    height: 1,
-    backgroundColor: Colors.borderLight,
-    marginVertical: 8,
-  },
-  modalCancel: {
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginTop: 8,
-    borderRadius: 12,
-    backgroundColor: Colors.lightBackground,
-  },
-  modalCancelText: {
-    fontSize: 16,
-    fontFamily: GlobalFonts.textMedium,
-    color: Colors.textGray,
   },
 });
 
