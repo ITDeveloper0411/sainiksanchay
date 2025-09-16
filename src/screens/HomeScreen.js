@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   StatusBar,
   RefreshControl,
-  Platform,
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -64,7 +63,6 @@ export default function HomeScreen({ navigation }) {
       <StatusBar
         backgroundColor={Colors.primaryBlue}
         barStyle="light-content"
-        translucent={Platform.OS === 'android' && Platform.Version >= 21}
       />
 
       {/* SafeAreaView for top and bottom with custom padding */}

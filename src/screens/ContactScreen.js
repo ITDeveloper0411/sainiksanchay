@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primaryBlue,
     paddingVertical: 16,
     paddingHorizontal: 20,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 16 : 16,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 10 : 16,
   },
   topHeaderTitle: {
     fontSize: 18,

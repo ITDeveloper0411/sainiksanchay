@@ -6,6 +6,7 @@ import {
   Text,
   Image,
   ScrollView,
+  Platform,
   StatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -23,84 +24,100 @@ const RegistrationSuccessMessage = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView
-      style={styles.container}
-      edges={['top', 'left', 'right', 'bottom']}
-    >
+    <View style={styles.container}>
       <StatusBar
         backgroundColor={Colors.primaryBlue}
         barStyle="light-content"
       />
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.header}>
-          <View style={styles.logoContainer}>
-            <Image
-              source={LOGO}
-              style={styles.logoImage}
-              resizeMode="contain"
-            />
-          </View>
-          <Text style={styles.title}>Sainik Sanchay</Text>
-        </View>
-
-        <View style={styles.content}>
-          <Ionicons name="checkmark-circle" size={80} color={Colors.success} />
-
-          <Text style={styles.successTitle}>Registration Successful!</Text>
-
-          <Text style={styles.successMessage}>
-            {message ||
-              'Your payment has been received successfully. Your registration is now complete.'}
-          </Text>
-
-          <View style={styles.detailsCard}>
-            <Text style={styles.detailsTitle}>What's Next?</Text>
-
-            <View style={styles.detailItem}>
-              <Ionicons
-                name="checkmark-circle"
-                size={20}
-                color={Colors.success}
+      <SafeAreaView style={styles.safeArea} edges={['left', 'right', 'bottom']}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.header}>
+            <View style={styles.logoContainer}>
+              <Image
+                source={LOGO}
+                style={styles.logoImage}
+                resizeMode="contain"
               />
-              <Text style={styles.detailText}>
-                Your payment is being verified by our team.
-              </Text>
             </View>
-
-            <View style={styles.detailItem}>
-              <Ionicons name="call" size={20} color={Colors.primaryBlue} />
-              <Text style={styles.detailText}>
-                Login details will be shared with you via a phone call after
-                verification.
-              </Text>
-            </View>
-
-            <View style={styles.detailItem}>
-              <Ionicons name="time" size={20} color={Colors.warning} />
-              <Text style={styles.detailText}>
-                Verification usually takes 24-48 hours.
-              </Text>
-            </View>
+            <Text style={styles.title}>Sainik Sanchay</Text>
           </View>
 
-          <View style={styles.buttonContainer}>
-            <CustomButton
-              title="Continue to Login"
-              onPress={handleLoginRedirect}
-              variant="primary"
-              size="large"
+          <View style={styles.content}>
+            <Ionicons
+              name="checkmark-circle"
+              size={80}
+              color={Colors.success}
             />
-          </View>
 
-          <Text style={styles.contactText}>
-            For any queries, please contact support@sainiksanchay.org
-          </Text>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+            <Text style={styles.successTitle}>Registration Successful!</Text>
+
+            <Text style={styles.successMessage}>
+              {message ||
+                'Your payment has been received successfully. Your registration is now complete.'}
+            </Text>
+
+            <View style={styles.detailsCard}>
+              <Text style={styles.detailsTitle}>What's Next?</Text>
+
+              <View style={styles.detailItem}>
+                <Ionicons
+                  name="checkmark-circle"
+                  size={20}
+                  color={Colors.success}
+                />
+                <Text style={styles.detailText}>
+                  Your payment is being verified by our team.
+                </Text>
+              </View>
+
+              <View style={styles.detailItem}>
+                <Ionicons name="call" size={20} color={Colors.primaryBlue} />
+                <Text style={styles.detailText}>
+                  Login details will be shared with you via a phone call after
+                  verification.
+                </Text>
+              </View>
+
+              <View style={styles.detailItem}>
+                <Ionicons
+                  name="phone-portrait"
+                  size={20}
+                  color={Colors.primaryBlue}
+                />
+                <Text style={styles.detailText}>
+                  You can also download the 'Theek Hai' app from Play Store and
+                  create an account using your registered number to receive
+                  login details.
+                </Text>
+              </View>
+
+              <View style={styles.detailItem}>
+                <Ionicons name="time" size={20} color={Colors.warning} />
+                <Text style={styles.detailText}>
+                  Verification usually takes 24-48 hours.
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.buttonContainer}>
+              <CustomButton
+                title="Continue to Login"
+                onPress={handleLoginRedirect}
+                variant="primary"
+                size="large"
+              />
+            </View>
+
+            <Text style={styles.contactText}>
+              For any queries, please contact support@sainiksanchay.org
+            </Text>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </View>
   );
 };
 
@@ -108,6 +125,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.lightBackground,
+  },
+  safeArea: {
+    flex: 1,
   },
   scrollContainer: {
     flexGrow: 1,
@@ -118,6 +138,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 20 : 20,
   },
   logoContainer: {
     width: 80,

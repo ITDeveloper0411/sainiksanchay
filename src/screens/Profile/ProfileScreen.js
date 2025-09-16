@@ -283,7 +283,6 @@ const ProfileScreen = ({ navigation }) => {
       <StatusBar
         backgroundColor={Colors.primaryBlue}
         barStyle="light-content"
-        translucent={Platform.OS === 'android'}
       />
 
       <SafeAreaView

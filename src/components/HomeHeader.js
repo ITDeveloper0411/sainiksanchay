@@ -5,8 +5,8 @@ import {
   Image,
   StyleSheet,
   ActivityIndicator,
-  Platform,
   StatusBar,
+  TouchableOpacity,
 } from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { GlobalFonts } from '../config/GlobalFonts';
@@ -39,12 +39,14 @@ const HomeHeader = ({ navigation }) => {
         <StatusBar
           barStyle="light-content"
           backgroundColor={Colors.primaryBlue}
-          translucent={Platform.OS === 'android' && Platform.Version >= 21}
         />
 
         <View style={styles.header}>
           <View style={styles.profileContainer}>
-            <View style={styles.imageContainer}>
+            <TouchableOpacity
+              style={styles.imageContainer}
+              onPress={() => navigation.navigate('Account')}
+            >
               {imageLoading && (
                 <ActivityIndicator
                   style={styles.loader}
@@ -66,7 +68,7 @@ const HomeHeader = ({ navigation }) => {
                 onLoad={handleImageLoad}
                 resizeMode="cover"
               />
-            </View>
+            </TouchableOpacity>
             <View style={styles.userInfo}>
               <Text
                 style={styles.userName}
@@ -80,12 +82,15 @@ const HomeHeader = ({ navigation }) => {
               </Text>
             </View>
           </View>
-          <View style={styles.incomeContainer}>
+          <TouchableOpacity
+            style={styles.incomeContainer}
+            onPress={() => navigation.navigate('ReferralIncome')}
+          >
             <Ionicons name="wallet-outline" size={20} color={Colors.success} />
             <Text style={styles.incomeAmount}>
               {profile?.refAmount ? `₹${profile.refAmount}` : '₹0'}
             </Text>
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>

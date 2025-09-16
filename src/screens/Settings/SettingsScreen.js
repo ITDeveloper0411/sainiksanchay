@@ -11,7 +11,10 @@ import {
   Platform,
   StatusBar,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { GlobalFonts } from '../../config/GlobalFonts';
@@ -23,17 +26,17 @@ import { HEIGHT, LOGO } from '../../config/Constant';
 import { ShowToast } from '../../components/ShowToast';
 
 const SettingsScreen = ({ navigation }) => {
+  const insets = useSafeAreaInsets();
   const { profile } = useSelector(state => state.profile);
   const dispatch = useDispatch();
   const [image, setImage] = useState(profile?.profile_img || null);
   const [uploading, setUploading] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
-  // Improved image upload function with better error handling
   const uploadProfileImage = async imageData => {
     try {
       setUploading(true);
 
-      // Create form data for the image
       const formData = new FormData();
       formData.append('profile_img', {
         uri: imageData.uri,
@@ -41,12 +44,9 @@ const SettingsScreen = ({ navigation }) => {
         name: imageData.fileName || `profile_${Date.now()}.jpg`,
       });
 
-      // Dispatch the action to update profile image
       const result = await dispatch(
         profileActions.profileImageUpdate(formData),
       );
-
-      // Refresh profile data
       await dispatch(profileActions.getProfile());
 
       if (result && result.success) {
@@ -81,7 +81,6 @@ const SettingsScreen = ({ navigation }) => {
           Alert.alert('Error', 'Failed to pick image');
         } else if (response.assets && response.assets.length > 0) {
           const imageData = response.assets[0];
-          // Upload the image to server
           uploadProfileImage(imageData);
         }
       });
@@ -91,18 +90,27 @@ const SettingsScreen = ({ navigation }) => {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     Alert.alert('Logout', 'Are you sure you want to logout?', [
-      { text: 'Cancel', style: 'cancel' },
+      { text: 'Cancel', style: 'cancel', onPress: () => setLoggingOut(false) },
       {
         text: 'Logout',
         style: 'destructive',
-        onPress: () => dispatch(authActions.logout()),
+        onPress: async () => {
+          setLoggingOut(true);
+          try {
+            await dispatch(authActions.logout());
+          } catch (error) {
+            console.error('Logout error:', error);
+            ShowToast('Failed to logout. Please try again.');
+          } finally {
+            setLoggingOut(false);
+          }
+        },
       },
     ]);
   };
 
-  // Function to get KYC status details
   const getKycStatusDetails = () => {
     const status = profile?.kyc_status || 'NOT VERIFIED';
     let icon, color, message, bgColor;
@@ -196,17 +204,21 @@ const SettingsScreen = ({ navigation }) => {
       <StatusBar
         backgroundColor={Colors.primaryBlue}
         barStyle="light-content"
-        translucent={Platform.OS === 'android'}
       />
 
-      {/* SafeAreaView with proper edges for iOS and Android */}
-      <SafeAreaView style={styles.container} edges={['left', 'right']}>
+      <SafeAreaView
+        style={styles.container}
+        edges={['left', 'right', 'bottom']}
+      >
         <ScrollView
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContentContainer}
+          contentContainerStyle={[
+            styles.scrollContentContainer,
+            { paddingBottom: insets.bottom + 100 },
+          ]}
         >
-          {/* Profile Header Section */}
+          {/* --- Profile Header --- */}
           <View style={styles.profileHeader}>
             <View style={styles.profileCard}>
               <View style={styles.imageContainer}>
@@ -245,7 +257,7 @@ const SettingsScreen = ({ navigation }) => {
             </View>
           </View>
 
-          {/* KYC Status Banner */}
+          {/* --- KYC Banner --- */}
           {profile?.kyc_status && (
             <View
               style={[styles.kycBanner, { backgroundColor: kycStatus.bgColor }]}
@@ -281,7 +293,7 @@ const SettingsScreen = ({ navigation }) => {
             </View>
           )}
 
-          {/* Menu Items */}
+          {/* --- Menu Items --- */}
           <View style={styles.menuContainer}>
             <Text style={styles.sectionTitle}>Account Settings</Text>
             {menuItems.map(item => (
@@ -317,7 +329,7 @@ const SettingsScreen = ({ navigation }) => {
             ))}
           </View>
 
-          {/* Support Section */}
+          {/* --- Support --- */}
           <View style={styles.supportContainer}>
             <Text style={styles.sectionTitle}>Support</Text>
             <TouchableOpacity
@@ -336,14 +348,21 @@ const SettingsScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
-          {/* Logout Button */}
+          {/* --- Logout --- */}
           <TouchableOpacity
-            style={styles.logoutButton}
+            style={[styles.logoutButton, loggingOut && { opacity: 0.6 }]}
             onPress={handleLogout}
             activeOpacity={0.7}
+            disabled={loggingOut}
           >
-            <Ionicons name="log-out-outline" size={20} color={Colors.error} />
-            <Text style={styles.logoutText}>Logout</Text>
+            {loggingOut ? (
+              <ActivityIndicator size="small" color={Colors.error} />
+            ) : (
+              <Ionicons name="log-out-outline" size={20} color={Colors.error} />
+            )}
+            <Text style={styles.logoutText}>
+              {loggingOut ? 'Logging out...' : 'Logout'}
+            </Text>
           </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
@@ -352,21 +371,10 @@ const SettingsScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  fullContainer: {
-    flex: 1,
-    backgroundColor: Colors.white,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: Colors.lightBackground,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContentContainer: {
-    paddingBottom: 80, // Increased padding to ensure logout button is visible
-    minHeight: HEIGHT,
-  },
+  fullContainer: { flex: 1, backgroundColor: Colors.white },
+  container: { flex: 1, backgroundColor: Colors.lightBackground },
+  scrollView: { flex: 1 },
+  scrollContentContainer: { minHeight: HEIGHT },
   profileHeader: {
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 20 : 20,
     paddingHorizontal: 20,
@@ -375,34 +383,19 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
     marginBottom: 16,
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 3,
   },
   profileCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    padding: 12,
     backgroundColor: Colors.white,
     borderRadius: 20,
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
   },
-  imageContainer: {
-    position: 'relative',
-    marginRight: 20,
-  },
+  imageContainer: { position: 'relative', marginRight: 20 },
   profileImage: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    borderWidth: 3,
-    borderColor: Colors.borderLight,
     resizeMode: 'contain',
   },
   imageLoading: {
@@ -411,9 +404,6 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: Colors.borderLight,
-    borderWidth: 3,
-    borderColor: Colors.borderLight,
   },
   editImageButton: {
     position: 'absolute',
@@ -425,55 +415,37 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: Colors.white,
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
   },
-  userInfo: {
-    flex: 1,
-  },
+  userInfo: { flex: 1 },
   userName: {
-    fontSize: 20,
+    fontSize: 16,
     fontFamily: GlobalFonts.textBold,
     color: Colors.textDark,
     marginBottom: 6,
   },
   userId: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: GlobalFonts.textMedium,
     color: Colors.textGray,
     marginBottom: 4,
   },
   userPhone: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: GlobalFonts.textLight,
     color: Colors.textGray,
   },
-  // KYC Banner Styles
   kycBanner: {
     marginHorizontal: 16,
     marginBottom: 16,
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 10,
+    padding: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  kycBannerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  kycIcon: {
-    marginRight: 12,
-  },
-  kycTextContainer: {
-    flex: 1,
-  },
+  kycBannerContent: { flexDirection: 'row', alignItems: 'center', flex: 1 },
+  kycIcon: { marginRight: 12 },
+  kycTextContainer: { flex: 1 },
   kycStatusText: {
     fontSize: 16,
     fontFamily: GlobalFonts.textSemiBold,
@@ -491,10 +463,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.error,
   },
-  kycActionText: {
-    fontSize: 14,
-    fontFamily: GlobalFonts.textMedium,
-  },
+  kycActionText: { fontSize: 14, fontFamily: GlobalFonts.textMedium },
   sectionTitle: {
     fontSize: 18,
     fontFamily: GlobalFonts.textSemiBold,
@@ -508,11 +477,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderRadius: 20,
     padding: 16,
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
   },
   menuItem: {
     flexDirection: 'row',
@@ -535,12 +499,7 @@ const styles = StyleSheet.create({
     fontFamily: GlobalFonts.textMedium,
     color: Colors.textLightGray,
   },
-  // Status Badge Styles
-  statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
+  statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
   statusText: {
     fontSize: 12,
     fontFamily: GlobalFonts.textMedium,
@@ -553,11 +512,6 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     borderRadius: 20,
     padding: 16,
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
   },
   supportCard: {
     flexDirection: 'row',
@@ -575,9 +529,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 16,
   },
-  supportContent: {
-    flex: 1,
-  },
+  supportContent: { flex: 1 },
   supportTitle: {
     fontSize: 16,
     fontFamily: GlobalFonts.textSemiBold,
@@ -597,12 +549,6 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 16,
     marginHorizontal: 16,
-    marginBottom: 30,
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
   },
   logoutText: {
     fontSize: 16,

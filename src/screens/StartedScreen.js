@@ -10,12 +10,12 @@ import {
   Animated,
   Easing,
   Platform,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'react-native-linear-gradient';
-import { LOGO, WIDTH } from '../config/Constant';
+import { LOGO } from '../config/Constant';
 import { Colors } from '../config/Colors';
-
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { GlobalFonts } from '../config/GlobalFonts';
 
@@ -23,6 +23,8 @@ const StartedScreen = ({ navigation }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef(null);
   const buttonScale = useRef(new Animated.Value(1)).current;
+  const WIDTH = Dimensions.get('window').width;
+  const STATUS_BAR_HEIGHT = StatusBar.currentHeight || 0;
 
   const featuresData = {
     savings: [
@@ -208,17 +210,16 @@ const StartedScreen = ({ navigation }) => {
       <StatusBar
         barStyle="light-content"
         backgroundColor={Colors.primaryBlue}
-        translucent={Platform.OS === 'android' && Platform.Version >= 21}
       />
 
-      <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
+      <SafeAreaView style={styles.safeArea} edges={['left', 'right', 'bottom']}>
         {/* Premium Header Design */}
         <LinearGradient
           colors={[Colors.primaryBlue, Colors.primary, Colors.primaryLight]}
           style={[
             styles.header,
             Platform.OS === 'android' &&
-              Platform.Version >= 21 && { paddingTop: StatusBar.currentHeight },
+              Platform.Version >= 21 && { paddingTop: STATUS_BAR_HEIGHT },
           ]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -255,26 +256,28 @@ const StartedScreen = ({ navigation }) => {
         </LinearGradient>
 
         {/* Main Content with Horizontal Scroll */}
-        <View style={styles.flatListContainer}>
-          <FlatList
-            ref={flatListRef}
-            data={infoData}
-            renderItem={renderItem}
-            keyExtractor={item => item.id}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            onScroll={handleScroll}
-            scrollEventThrottle={16}
-            contentContainerStyle={styles.flatListContent}
-            getItemLayout={(data, index) => ({
-              length: WIDTH,
-              offset: WIDTH * index,
-              index,
-            })}
-          />
+        <View style={styles.contentContainer}>
+          <View style={styles.flatListWrapper}>
+            <FlatList
+              ref={flatListRef}
+              data={infoData}
+              renderItem={renderItem}
+              keyExtractor={item => item.id}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onScroll={handleScroll}
+              scrollEventThrottle={16}
+              contentContainerStyle={styles.flatListContent}
+              getItemLayout={(data, index) => ({
+                length: WIDTH,
+                offset: WIDTH * index,
+                index,
+              })}
+            />
+          </View>
 
-          {/* New Indicator Design */}
+          {/* Indicator positioned correctly */}
           <View style={styles.indicatorContainer}>
             {infoData.map((_, index) => (
               <TouchableOpacity
@@ -288,8 +291,8 @@ const StartedScreen = ({ navigation }) => {
                     {
                       backgroundColor:
                         index === activeIndex
-                          ? Colors.indicatorActive
-                          : Colors.indicatorInactive,
+                          ? Colors.indicatorActive || Colors.primary
+                          : Colors.indicatorInactive || '#ccc',
                       width: index === activeIndex ? 30 : 20,
                     },
                   ]}
@@ -304,13 +307,14 @@ const StartedScreen = ({ navigation }) => {
           <Animated.View
             style={[
               styles.getStartedContainer,
-              { transform: [{ scale: buttonScale }] },
+              {
+                transform: [{ scale: buttonScale }],
+              },
             ]}
           >
             <TouchableOpacity
               style={styles.getStartedButton}
               onPress={() => {
-                // Handle get started actions
                 navigation.navigate('Login');
               }}
               activeOpacity={0.7}
@@ -328,7 +332,7 @@ const StartedScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.lightBackground,
+    backgroundColor: Colors.lightBackground || '#f8f9fa',
   },
   safeArea: {
     flex: 1,
@@ -339,7 +343,7 @@ const styles = StyleSheet.create({
     paddingBottom: 25,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
-    shadowColor: Colors.shadow,
+    shadowColor: Colors.shadow || '#000',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
     shadowRadius: 15,
@@ -367,7 +371,7 @@ const styles = StyleSheet.create({
     borderRightWidth: 60,
     borderTopWidth: 60,
     borderRightColor: 'transparent',
-    borderTopColor: Colors.transparentBlue10,
+    borderTopColor: Colors.transparentBlue10 || 'rgba(255,255,255,0.1)',
   },
   cornerAccentTopRight: {
     position: 'absolute',
@@ -380,7 +384,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 60,
     borderTopWidth: 60,
     borderLeftColor: 'transparent',
-    borderTopColor: Colors.transparentBlue10,
+    borderTopColor: Colors.transparentBlue10 || 'rgba(255,255,255,0.1)',
   },
   headerContent: {
     flexDirection: 'row',
@@ -388,10 +392,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   logoContainer: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.white || '#fff',
     borderRadius: 20,
     padding: 10,
-    shadowColor: Colors.shadow,
+    shadowColor: Colors.shadow || '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -412,9 +416,9 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 26,
     fontFamily: GlobalFonts.textBoldItalic,
-    color: Colors.white,
+    color: Colors.white || '#fff',
     marginBottom: 5,
-    textShadowColor: Colors.transparentBlack30,
+    textShadowColor: Colors.transparentBlack30 || 'rgba(0,0,0,0.3)',
     textShadowOffset: { width: 1, height: 2 },
     textShadowRadius: 4,
     letterSpacing: 0.5,
@@ -422,7 +426,7 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     fontSize: 16,
     fontFamily: GlobalFonts.textMediumItalic,
-    color: Colors.accentBlue,
+    color: Colors.accentBlue || '#a0d2ff',
     letterSpacing: 0.8,
     marginBottom: 12,
   },
@@ -434,17 +438,17 @@ const styles = StyleSheet.create({
   dividerLine: {
     height: 1,
     width: 40,
-    backgroundColor: Colors.transparentBlue40,
+    backgroundColor: Colors.transparentBlue40 || 'rgba(255,255,255,0.4)',
     marginHorizontal: 8,
   },
   headerBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.transparentOrange90,
+    backgroundColor: Colors.transparentOrange90 || 'rgba(255,165,0,0.9)',
     borderRadius: 12,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    shadowColor: Colors.shadow,
+    shadowColor: Colors.shadow || '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -453,10 +457,14 @@ const styles = StyleSheet.create({
   headerBadgeText: {
     fontSize: 12,
     fontFamily: GlobalFonts.textSemiBold,
-    color: Colors.white,
+    color: Colors.white || '#fff',
     marginLeft: 4,
   },
-  flatListContainer: {
+  contentContainer: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  flatListWrapper: {
     flex: 1,
     justifyContent: 'center',
   },
@@ -476,14 +484,14 @@ const styles = StyleSheet.create({
   infoTitle: {
     fontSize: 22,
     fontFamily: GlobalFonts.textSemiBoldItalic,
-    color: Colors.textDark,
+    color: Colors.textDark || '#333',
     marginBottom: 10,
     textAlign: 'center',
   },
   infoText: {
     fontSize: 14,
     fontFamily: GlobalFonts.textLightItalic,
-    color: Colors.textGray,
+    color: Colors.textGray || '#666',
     lineHeight: 22,
     textAlign: 'center',
     marginBottom: 10,
@@ -492,13 +500,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   featureItem: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.white || '#fff',
     borderRadius: 10,
     padding: 12,
     alignItems: 'center',
     margin: 5,
-    width: WIDTH / 2 - 30,
-    shadowColor: Colors.shadow,
+    width: Dimensions.get('window').width / 2 - 30,
+    shadowColor: Colors.shadow || '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -518,21 +526,22 @@ const styles = StyleSheet.create({
   featureTitle: {
     fontSize: 14,
     fontFamily: GlobalFonts.textSemiBoldItalic,
-    color: Colors.textDark,
+    color: Colors.textDark || '#333',
     marginBottom: 4,
     textAlign: 'center',
   },
   featureDesc: {
     fontSize: 12,
     fontFamily: GlobalFonts.textLightItalic,
-    color: Colors.textGray,
+    color: Colors.textGray || '#666',
     textAlign: 'center',
   },
   indicatorContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    paddingVertical: 15,
+    marginBottom: Platform.OS === 'android' ? 10 : 5,
   },
   indicatorButton: {
     padding: 5,
@@ -544,18 +553,17 @@ const styles = StyleSheet.create({
   },
   getStartedContainer: {
     paddingHorizontal: 40,
-    paddingBottom: 30,
-    paddingTop: 10,
+    paddingBottom: Platform.OS === 'android' ? 30 : 25,
   },
   getStartedButton: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.primary || '#0066cc',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 15,
     paddingHorizontal: 25,
     borderRadius: 30,
-    shadowColor: Colors.shadow,
+    shadowColor: Colors.shadow || '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -564,7 +572,7 @@ const styles = StyleSheet.create({
   getStartedText: {
     fontSize: 18,
     fontFamily: GlobalFonts.textBoldItalic,
-    color: Colors.white,
+    color: Colors.white || '#fff',
     marginRight: 10,
   },
 });

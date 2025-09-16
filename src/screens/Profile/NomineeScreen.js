@@ -1,13 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Platform,
-  StatusBar,
-  KeyboardAvoidingView,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import { GlobalFonts } from '../../config/GlobalFonts';
@@ -131,7 +123,6 @@ const NomineeScreen = ({ navigation }) => {
       <StatusBar
         backgroundColor={Colors.primaryBlue}
         barStyle="light-content"
-        translucent={Platform.OS === 'android' && Platform.Version >= 21}
       />
       <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
         <BackHeader

@@ -71,7 +71,6 @@ export default function LoginScreen({ navigation }) {
       <StatusBar
         backgroundColor={Colors.primaryBlue}
         barStyle="light-content"
-        translucent={Platform.OS === 'android' && Platform.Version >= 21}
       />
       <SafeAreaView style={styles.safeArea} edges={['left', 'right', 'bottom']}>
         <KeyboardAvoidingView

@@ -100,7 +100,6 @@ const ChangePasswordScreen = ({ navigation }) => {
       <StatusBar
         backgroundColor={Colors.primaryBlue}
         barStyle="light-content"
-        translucent={Platform.OS === 'android' && Platform.Version >= 21}
       />
       <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
         <BackHeader
