@@ -26,8 +26,8 @@ export default function LoginScreen({ navigation }) {
   const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [username, setUsername] = useState('SAM0000');
-  const [password, setPassword] = useState('9906256789');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState({});
 
